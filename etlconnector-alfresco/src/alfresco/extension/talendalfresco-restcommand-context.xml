@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<!--
+ETL Connector for Alfresco - Alfresco Server Extension
+http://forge.alfresco.com/projects/etlconnector/
+Copyright (C) 2008 Open Wide SA
+-->
+<beans>
+
+   <!-- Command Base & Registrator -->
+   <bean id="talendalfresco.rest.commandBase" abstract="true" init-method="registerCommandClass">
+        <property name="namespaceService">
+            <ref bean="NamespaceService" />
+        </property>
+        <property name="dictionaryService">
+            <ref bean="dictionaryService" />
+        </property>
+        <property name="nodeService">
+            <ref bean="nodeService" />
+        </property>
+        <property name="contentService">
+            <ref bean="contentService" />
+        </property>
+        <property name="searchService">
+            <ref bean="searchService" />
+        </property>
+        <property name="fileFolderService">
+            <ref bean="fileFolderService" />
+        </property>
+        <property name="authorityService">
+           <ref bean="authorityService" />
+        </property>
+        <property name="permissionService">
+           <ref bean="permissionService" />
+        </property>
+        <property name="actionService">
+            <ref bean="actionService" />
+        </property>
+        <property name="authenticationService">
+         <ref bean="authenticationService" />
+        </property>
+        <property name="personService">
+            <ref bean="personService" />
+        </property>
+        <property name="transactionService">
+            <ref bean="transactionService" />
+        </property>
+   </bean>
+   
+
+   <bean id="talendalfresco.rest.loginCommand" parent="talendalfresco.rest.commandBase"
+         class="fr.openwide.talendalfresco.rest.server.command.LoginCommand">
+   </bean>
+
+   <bean id="talendalfresco.rest.logoutCommand" parent="talendalfresco.rest.commandBase"
+         class="fr.openwide.talendalfresco.rest.server.command.LogoutCommand">
+   </bean>
+
+   <bean id="talendalfresco.rest.importCommand" parent="talendalfresco.rest.commandBase"
+         class="fr.openwide.talendalfresco.rest.server.command.ImportCommand">
+      <property name="namePathService">
+         <ref bean="talendalfresco.namePathService" />
+      </property>
+      <property name="contentImporterService">
+         <ref bean="talendalfresco.contentImporterService" />
+      </property>
+   </bean>
+
+</beans>

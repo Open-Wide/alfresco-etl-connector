@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+ 
+ <!--
+ETL Connector for Alfresco - Alfresco Server Extension
+http://forge.alfresco.com/projects/etlconnector/
+Copyright (C) 2008 Open Wide SA
+-->
+<beans>
+
+    <!-- Handles txn etc. so put all services in lower caps (only search and ownable were) -->
+    <bean id="talendalfresco.contentImporterService" class="fr.openwide.talendalfresco.alfresco.importer.ContentImporterComponent">
+        <!-- For now, hard-wire the view parser -->
+        <property name="namespaceService">
+            <ref bean="NamespaceService" />
+        </property>
+        <property name="dictionaryService">
+            <ref bean="dictionaryService" />
+        </property>
+        <property name="nodeService">
+            <ref bean="nodeService" />
+        </property>
+        <property name="contentService">
+            <ref bean="contentService" />
+        </property>
+        <property name="ruleService">
+            <ref bean="ruleService" />
+        </property>
+        <property name="permissionService">
+            <ref bean="permissionService" />
+        </property>
+        <property name="authorityService">
+            <ref bean="authorityService" />
+        </property>
+        <property name="authenticationService">
+            <ref bean="authenticationService" />
+        </property>
+        <property name="viewParser">
+            <ref bean="talendalfresco.contentViewParser" />
+        </property>
+        <property name="behaviourFilter">
+            <ref bean="policyBehaviourFilter" />
+        </property>
+        <property name="searchService">
+            <ref bean="searchService" />
+        </property>
+        <property name="ownableService">
+            <ref bean="ownableService" />
+        </property>
+        <!-- [talendalfresco] for transactions -->
+        <property name="transactionService">
+            <ref bean="transactionService" />
+        </property>
+        <!-- [talendalfresco] for content mimetype guessing -->
+        <property name="mimetypeService">
+            <ref bean="mimetypeService" />
+        </property>
+        <!-- [talendalfresco] for resolving namepath references -->
+        <property name="namePathService">
+            <ref bean="talendalfresco.namePathService" />
+        </property>
+    </bean>
+
+    <!-- Handles txn etc. so put all services in lower caps (only search and ownable were) -->
+    <bean id="talendalfresco.namePathService" class="fr.openwide.talendalfresco.alfresco.NamePathServiceImpl">
+        <property name="nodeService">
+            <ref bean="nodeService" />
+        </property>
+        <property name="searchService">
+            <ref bean="searchService" />
+        </property>
+    </bean>
+
+    <bean id="talendalfresco.contentViewParser" class="fr.openwide.talendalfresco.alfresco.importer.ContentViewParser">
+        <property name="namespaceService">
+            <ref bean="namespaceService" />
+        </property>
+        <property name="dictionaryService">
+            <ref bean="dictionaryService" />
+        </property>
+        <property name="nodeService">
+            <ref bean="nodeService" />
+        </property>
+    </bean>
+      
+</beans>

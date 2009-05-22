@@ -1,0 +1,77 @@
+<!--
+ETL Connector for Alfresco - Alfresco server extension
+http://forge.alfresco.com/projects/etlconnector/
+Copyright (C) 2008 Open Wide SA
+-->
+
+<project default="deploy" basedir="." name="etlconnector-alfresco">
+	<property file="./build.properties" />
+
+	<!-- =================================================================== -->
+	<!-- Prepares the build directory                                        -->
+	<!-- =================================================================== -->
+
+	<target name="init-project">
+		<mkdir dir="${src.dir}" />
+		<mkdir dir="${web.dir}" />
+		<mkdir dir="${web.dir}/WEB-INF" />
+		<mkdir dir="${web.dir}/WEB-INF/lib" />
+		<mkdir dir="${classes.dir}" />
+		<mkdir dir="${build.dir}/export" />
+	</target>
+	
+	<target name="prepare" depends="init-project">
+		<delete dir="${build.dir}/export" />
+		<mkdir dir="${build.dir}/export" />
+		<mkdir dir="${build.dir}/export/WEB-INF" />
+		<mkdir dir="${build.dir}/export/WEB-INF/lib" />
+		<mkdir dir="${build.dir}/export/WEB-INF/classes" />
+	</target>
+
+
+	<target name="jar" depends="prepare">
+		<jar jarfile="${build.dir}/export/WEB-INF/lib/${project.name}_${version}.jar"  update="false"  >
+			<!-- Adding the alfresco classes -->
+			<fileset dir="${classes.dir}" includes="**" />
+			<!-- Adding the source -->
+			<fileset dir="${src.dir}" includes="**" />
+		</jar>
+	</target>
+
+
+	<target name="deploy" depends="jar">
+		<copy todir="${alfresco.web.dir}">
+			<fileset dir="${web.dir}" includes="**" />
+		</copy>
+		<!-- WEB-INF/classes only useful for logging conf -->
+		<!-- copy todir="${build.dir}/export/WEB-INF/classes">
+			<fileset dir="${conf.dir}" includes="**" />
+		</copy -->
+		<copy todir="${alfresco.web.dir}/WEB-INF/lib"
+				file="${build.dir}/export/WEB-INF/lib/${project.name}_${version}.jar" />
+	</target>
+
+
+	<target name="export" depends="prepare">
+		<copy todir="${build.dir}/export">
+			<fileset dir="${web.dir}" includes="**" />
+		</copy>
+		<!-- WEB-INF/classes only useful for logging conf -->
+		<!-- copy todir="${build.dir}/export/WEB-INF/classes">
+			<fileset dir="${conf.dir}" includes="**" />
+		</copy -->
+		<jar jarfile="${build.dir}/export/WEB-INF/lib/${project.name}_${version}.jar"  update="false"  >
+			<!-- Adding the alfresco classes -->
+			<fileset dir="${classes.dir}" includes="**" />
+			<!-- Adding the source -->
+			<fileset dir="${src.dir}" includes="**" />
+		</jar>
+	</target>
+
+	<target name="package-extension" depends="export">
+			      <delete file="${package.file.zip}" />
+			      <zip destfile="${package.file.zip}">
+			         <zipfileset dir="${build.dir}/export" />
+			      </zip>
+			   </target>
+</project>

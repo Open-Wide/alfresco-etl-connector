@@ -1,0 +1,30 @@
+<view:view xmlns:view="http://www.alfresco.org/view/repository/1.0"
+           xmlns:cm="http://www.alfresco.org/model/content/1.0"
+           xmlns:app="http://www.alfresco.org/model/application/1.0">
+
+   <cm:folder view:childName="cm:folder">
+      <view:acl view:inherit="false">
+         <view:ace view:access="ALLOWED">
+            <view:authority>GROUP_EVERYONE</view:authority>
+            <view:permission>Consumer</view:permission>
+         </view:ace>
+      </view:acl>
+      <app:uifacets/>
+      <cm:name>my_folder</cm:name>
+      <app:icon>space-icon-default</app:icon>
+      <cm:title>My Folder</cm:title>
+      <cm:description>a nice folder</cm:description>
+      <cm:contains>
+      
+    <cm:content>
+    	<app:uifacets />
+    	<cm:name>my_file.pdf</cm:name>
+    	<cm:title>My File</cm:title>
+    	<cm:description>${my.desc}</cm:description>
+    	<cm:content>contentUrl=classpath:alfresco/bootstrap/Alfresco-Tutorial.pdf|mimetype=application/pdf|size=|encoding=</cm:content>
+    </cm:content>
+    
+      </cm:contains>
+   </cm:folder>
+
+</view:view>

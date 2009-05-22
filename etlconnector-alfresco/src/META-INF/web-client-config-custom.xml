@@ -1,0 +1,32 @@
+<!--
+ETL Connector for Alfresco - Alfresco Server Extension
+http://forge.alfresco.com/projects/etlconnector/
+Copyright (C) 2008 Open Wide SA
+-->
+<alfresco-config>
+   
+   <!-- UI configuration ; ONLY FOR TESTS -->
+   <!-- config evaluator="string-compare" condition="Action Wizards">
+      <aspects>
+         <aspect name="attacheable"/>
+      </aspects>
+   </config>
+   <config evaluator="aspect-name" condition="attacheable">
+      <property-sheet>
+         <show-association name="attachments"/>
+      </property-sheet>
+   </config -->
+   
+   <!-- Rest command configuration -->
+   <config evaluator="string-compare" condition="Command Servlet">
+      <!-- The list of registered servlet command processors -->
+      <!-- Command processors implement org.alfresco.web.app.servlet.command.CommandProcessor -->
+      <!-- They register a class impl against a unique name. All calls to the command servlet -->
+      <!-- which match the name are forwared to the class instance -->
+      <command-servlet>
+         <!-- REST command processor -->
+         <command-processor name="rest" class="fr.openwide.talendalfresco.rest.server.processor.RestCommandProcessor" />
+      </command-servlet>
+   </config>
+
+</alfresco-config>
