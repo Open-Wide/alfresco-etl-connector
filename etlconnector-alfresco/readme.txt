@@ -51,6 +51,15 @@ Alfresco installation, ex. $ALF_HOME/tomcat/webapps/alfresco/WEB-INF/lib
 Test
    * you can test it by using the samples provided in the companion project
 etlconnector-samples , and a compatible ETL like Talend 3.1 on the client side.
+   * for the quitus sample, using Talend :
+   * start the Alfresco server (after having installed the ETL Connector extension)
+   * import the etlconnector-samples/quitus/GED_TECHNIQUE.acp document package
+in the company home folder, using the Alfresco administration web interface
+   * start Talend
+   * import the etlconnector-samples/quitus/talend/ALFRESCO_ETLCONNECTOR_QUITUS
+as a Talend workspace project
+   * open the single Talend document import job
+   * run it in Talend : the document tree has been imported in Alfresco
 
 
 Documentation
