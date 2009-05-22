@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="ASCII"?>
+<talendfile:ContextType xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:talendfile="platform:/resource/org.talend.model/model/TalendFile.xsd" confirmationNeeded="false" name="Default">
+  <contextParameter comment="" name="PATH_RACINE" prompt="PATH_RACINE?" promptNeeded="false" type="id_String" value="GED TECHNIQUE"/>
+  <contextParameter comment="" name="PATH_FICHIER_RECETTE" prompt="PATH_FICHIER_RECETTE?" promptNeeded="false" type="id_String" value="&quot;C:/dev/talend/package_jeu_test/jeu_test_quitus&quot;"/>
+</talendfile:ContextType>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>ALFRESCO_ETLCONNECTOR_QUITUS</name>
+	<comment>ETL Connector for Alfresco - Quitus Sample</comment>
+	<projects>
+	</projects>
+	<buildSpec>
+	</buildSpec>
+	<natures>
+		<nature>org.talend.core.talendnature</nature>
+	</natures>
+</projectDescription>

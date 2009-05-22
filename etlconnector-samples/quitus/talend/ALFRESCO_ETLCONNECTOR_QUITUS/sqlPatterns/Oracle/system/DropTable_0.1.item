@@ -1,0 +1,4 @@
+-- This pattern is just an example for the RC release, and will be modified in future version.
+
+-- DROP STAGGING TABLE
+DROP TABLE <%= __DATABASE_NAME__ %>.<%= __TABLE_NAME__ %>;

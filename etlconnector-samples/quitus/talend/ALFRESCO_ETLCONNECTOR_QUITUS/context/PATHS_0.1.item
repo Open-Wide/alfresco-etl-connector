@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="ASCII"?>
+<talendfile:ContextType xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:talendfile="platform:/resource/org.talend.model/model/TalendFile.xsd" confirmationNeeded="false" name="Default">
+  <contextParameter comment="" name="PATH_SOURCE" prompt="PATH_SOURCE?" promptNeeded="false" type="id_String" value="C:\dev\workspace\etlconnector-samples\quitus"/>
+  <contextParameter comment="" name="PATH_DEST" prompt="PATH_DEST?" promptNeeded="false" type="id_String" value="\MA_MACHINE_ALFRESCO"/>
+</talendfile:ContextType>

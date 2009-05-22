@@ -1,0 +1,17 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<expression:EMFExpression xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:expression="http:///expression.ecore" id="null=>vers_tAlfresco=>secteur" expression="row3.secteurList ">
+  <variables name="row1.nomFichierAlfresco" value="null" talendType="id_String" nullable="true"/>
+  <variables name="row1.CODE_OUVRAGE" value="null" talendType="id_String" nullable="true"/>
+  <variables name="row1.date_pass" value="null" talendType="id_Date" nullable="true"/>
+  <variables name="row1.fichier_source" value="null" talendType="id_String" nullable="true"/>
+  <variables name="row1.rep_dest" value="null" talendType="id_String" nullable="true"/>
+  <variables name="row1.remarque" value="null" talendType="id_String" nullable="true"/>
+  <variables name="row1.carac08" value="null" talendType="id_String" nullable="true"/>
+  <variables name="row1.carac09" value="null" talendType="id_String" nullable="true"/>
+  <variables name="row1.carac10" value="null" talendType="id_String" nullable="true"/>
+  <variables name="row1.carac11" value="null" talendType="id_String" nullable="true"/>
+  <variables name="row1.carac14" value="null" talendType="id_String" nullable="true"/>
+  <variables name="row1.carac15" value="null" talendType="id_String" nullable="true"/>
+  <variables name="row3.nomFichierAlfresco" value="null" talendType="id_String" nullable="true"/>
+  <variables name="row3.secteurList" value="null" talendType="id_List" nullable="true"/>
+</expression:EMFExpression>
