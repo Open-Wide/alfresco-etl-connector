@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Definition of new Model -->
+
+<!-- The important part here is the name - Note: the use of the my: namespace
+     which is defined further on in the document -->
+<model name="H76:modelHabitat76" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+   <!-- Optional meta-data about the model -->   
+   <description>modele Habitat 76</description>
+   <author>Etude-Developpement</author>
+   <version>1.0</version>
+
+   <!-- Imports are required to allow references to definitions in other models -->   
+   <imports>
+   	  <!-- Import Alfresco Dictionary Definitions -->
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+      <!-- Import Alfresco Content Domain Model Definitions -->
+      <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+   </imports>
+
+   <!-- Introduction of new namespaces defined by this model -->
+   <!-- NOTE: The following namespace my.new.model should be changed to reflect your own namespace -->
+   <namespaces>
+      <namespace uri="http://www.devhabitat76.fr/model" prefix="H76"/>
+   </namespaces>
+ 
+   <!--Exemple de declaration de types -->
+    <types>
+      // Definition of new Content Type: Standard Operating Procedure 
+      <type name="H76:documentH76">
+         <title>Documents Habitat 76</title>
+         <parent>cm:content</parent>
+      </type>
+
+      //Secteur            
+      <type name="H76:secteurH76">
+         <title>Secteur géographique</title>
+         <parent>cm:content</parent>
+         <associations>
+            <association name="H76:controleur">
+               <source>
+                  <mandatory>false</mandatory>
+                  <many>true</many>
+               </source>
+               <target>
+                  <class>cm:person</class>
+                  <mandatory>false</mandatory>
+                  <many>true</many>
+               </target>
+            </association>
+         </associations>                  
+      </type>
+  
+         
+      // nouveau type pour les quitus 
+      <type name="H76:quitusH76">
+         <title>Quitus Habitat 76</title>
+         <parent>cm:content</parent>
+         
+	       <properties>
+				  <property name="H76:obsTech">
+					 <title>Observation entreprise de maintenance</title>
+					 <type>d:text</type>
+            <mandatory enforced='true'>true</mandatory>
+					 <default>NR</default>
+	        </property>
+          	       
+				  <property name="H76:trappeRamon08">
+					 <title>Trappe ramonage en mauvais état</title>
+					 <type>d:text</type>
+					 <default>NR</default>			           		 
+	        </property>
+	        
+	        <property name="H76:manchetteNonEtanche09">
+					 <title>Manchette non étanche</title>
+					 <type>d:text</type>
+					 <default>NR</default>			           		 
+	        </property>	
+          
+	        <property name="H76:conduitBistre10">
+					 <title>Conduit bistré</title>
+					 <type>d:text</type>
+					 <default>NR</default>			           		 
+	        </property>	        
+
+	        <property name="H76:tuyauAChanger11">
+					 <title>Tuyau à changer</title>
+					 <type>d:text</type>
+					 <default>NR</default>			           		 
+	        </property>
+
+	        <property name="H76:piecesARemplacer14">
+					 <title>Pièces à remplacer</title>
+					 <type>d:text</type>
+					 <default>NR</default>			           		 
+	        </property>
+
+	        <property name="H76:correctiviteAApporter15">
+					 <title>Coorectivité à apporter</title>
+					 <type>d:text</type>
+					 <default>NR</default>           					 
+	        </property>
+                  
+	       </properties>
+                  
+      </type>      
+    </types>
+      
+    <aspects>
+      <!-- Definition de l'aspect qui permet de faire un suivi sur un document -->
+	    <aspect name="H76:suivi">
+	       <title>Suivi du document</title>
+	       <properties>
+				    <property name="H76:dateInformation">
+					   <title>Date information</title>
+					   <type>d:date</type>					   
+	          </property>
+	          
+            <property name="H76:observationControle">
+					   <title>Observation</title>
+					   <type>d:text</type>
+	          </property>
+	          
+				    <property name="H76:dateControle">
+					   <title>Date du contrôle</title>
+					   <type>d:date</type>
+	          </property>	          
+	       </properties>
+	         
+         <associations>
+            <association name="H76:secteurGeographique">
+               <source>
+                  <mandatory>false</mandatory>
+                  <many>true</many>
+               </source>
+               <target>
+                  <class>H76:secteurH76</class>
+                  <mandatory>false</mandatory>
+                  <many>true</many>
+               </target>
+            </association>
+         </associations>
+	         
+	    </aspect>    
+
+
+      <!-- Definition de l'aspect ESI -->
+	    <aspect name="H76:esi">
+	       <title>Elément de structure immobilière</title>
+	       <properties>
+				    <property name="H76:natureEsi">
+					   <title>Nature de l'élément de structure immobilière</title>
+					   <type>d:text</type>
+	          </property>
+	          
+            <property name="H76:paesi_num">
+					   <title>Clé ULIS</title>
+					   <type>d:int</type>
+	          </property>
+	          	          
+	       </properties>	         
+	    </aspect>
+
+    
+      <!-- Definition de l'aspect qui gére la publication sur le portail -->
+	    <aspect name="H76:publicationPortail">
+	        <title>Publication dans le portail</title>
+	        <properties>
+				<property name="H76:datePublication">
+					<title>Date de publication sur le portail</title>
+					<type>d:date</type>
+	            </property>
+	            <property name="H76:nbJourPublication">
+					<title>Nombre de jours de publication sur le portail</title>
+					<type>d:int</type>
+	            </property>
+	         </properties>
+	    </aspect>
+	    
+	    <!-- Definition de l'aspect qui gére la publication sur le droit applicable aux salarie -->
+	    <aspect name="H76:informationContractuelle">
+	        <title>Information Contractuelle</title>
+	        <properties>
+	            <property name="H76:dateSignature">
+					<title>Date de signature</title>
+					<type>d:date</type>
+	            </property>
+	            <property name="H76:dateEntreeVigueur">
+					<title>Date d'entrée en vigueur</title>
+					<type>d:date</type>
+	            </property>
+	         </properties>
+	      </aspect>
+		<aspect name="H76:associationDocument">
+			<title>Association de document</title>
+			<associations>
+				<association name="H76:docsAssocies">
+					<source>
+						<mandatory>false</mandatory>
+						<many>true</many>
+					</source>
+					<target>
+						<class>H76:documentH76</class>
+						<mandatory>false</mandatory>
+						<many>true</many>
+					</target>
+				</association>
+			</associations>
+		</aspect>	
+		<!-- Definition de l'aspect qui gére la validation ou non du CR Codir par une sous direction -->
+	    <aspect name="H76:coDir">
+	      <title>Gestion de la validation des comptes rendus de comité de direction</title>
+	      <properties>
+	         <property name="H76:visaSD">
+					   <title>Validation par la sous-direction ou direction ? </title>
+					   <type>d:boolean</type>
+					   <default>false</default>
+	         </property>
+	        <property name="H76:dateLimiteSD">
+					   <title>Date limite pour la validation sous-direction ou direction </title>
+					   <type>d:date</type>
+	        </property>
+	      </properties>
+      </aspect>		
+      <!-- Definition de l'aspect qui gére les propriétés de projet AC -->
+      <aspect name="H76:visionAC">
+	      <title>Gestion des dossiers Vision</title>
+	      <properties>
+	         <property name="H76:dateValidAC">
+					   <title>Date de validation par Attribution et Congés</title>
+					   <type>d:date</type>
+					 </property>
+					  <property name="H76:dateValidCG">
+					   <title>Date de validation par le Controle de Gestion</title>
+					   <type>d:date</type>
+					 </property>
+					 <property name="H76:dateEnvoiMairie">
+					   <title>Date d'envoie à la mairie</title>
+					   <type>d:date</type>
+					 </property>
+	      </properties> 
+      </aspect>	
+      
+     <!-- definition de l'aspect qui informe le nombre de jour avant validation 
+     automatique dans les workflow 
+     <aspect name="H76:valideWorkflow">
+      <title>Gestion de la validation des workflow</title>
+      <properties>
+        <property name="H76:nbJourValidation">
+          <title>Nombre de jour avant validation auto</title>
+          <type>d:int</type>
+        </property>
+      </properties>
+     </aspect>	-->
+ </aspects>
+   
+  
+</model>

@@ -1,0 +1,73 @@
+<!--
+ETL Connector for Alfresco - Samples
+http://forge.alfresco.com/projects/etlconnector/
+Copyright (C) 2008 Open Wide SA
+-->
+
+<project default="deploy" basedir="." name="etlconnector-samples">
+	<property file="./build.properties" />
+
+	<!-- =================================================================== -->
+	<!-- Prepares the build directory                                        -->
+	<!-- =================================================================== -->
+
+	<target name="init-project">
+		<mkdir dir="${src.dir}" />
+		<mkdir dir="${lib.dir}" />
+		<mkdir dir="${classes.dir}" />
+		<mkdir dir="${build.dir}/export" />
+	</target>
+	
+	<target name="prepare" depends="init-project">
+		<delete dir="${build.dir}/export" />
+		<mkdir dir="${build.dir}/export" />
+	</target>
+
+
+	<target name="jar" depends="prepare">
+		<jar jarfile="${build.dir}/${project.name}_${version}.jar" update="false"  >
+			<!-- Adding the alfresco classes -->
+			<fileset dir="${classes.dir}" includes="**" />
+			<!-- Adding the source -->
+			<fileset dir="${src.dir}" includes="**" />
+         <!-- manifest -->
+         <manifest>
+          <attribute name="Built-By" value="Marc Dutoo"/>
+          <section name="${project.name}">
+            <attribute name="Specification-Title" value="${project.name}"/>
+            <attribute name="Specification-Version" value="${version}"/>
+            <attribute name="Specification-Vendor" value="Habitat 76"/>
+            <attribute name="Implementation-Title" value="${project.name}"/>
+            <attribute name="Implementation-Version" value="${version} ${TODAY}"/> 
+            <attribute name="Implementation-Vendor" value="Habitat 76"/>
+          </section>
+        </manifest>
+		</jar>
+	</target>
+
+
+	<target name="deploy" depends="jar">
+		<copy todir="${alfresco.web.dir}/WEB-INF/lib"
+				file="${build.dir}/${project.name}_${version}.jar" />
+	</target>
+
+	<target name="package-standalone" depends="deploy">
+		<copy todir="${build.dir}/export"
+				file="${build.dir}/${project.name}_${version}.jar" />
+		<copy todir="${build.dir}/export">
+			<fileset dir="${lib.dir}" includes="**" />
+		</copy>
+	   <!-- quitus sample -->
+      <copy todir="${build.dir}/export">
+         <fileset dir="${basedir}" includes="quitus/**" />
+      </copy>
+      <!-- doc -->
+      <copy todir="${build.dir}/export">
+         <fileset dir="${basedir}" includes="*.txt" />
+      </copy>
+      <delete file="${package.file.zip}" />
+      <zip destfile="${package.file.zip}">
+         <zipfileset dir="${build.dir}/export" />
+      </zip>
+	</target>
+</project>
