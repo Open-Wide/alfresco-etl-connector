@@ -35,6 +35,19 @@ Copyright (C) 2008 Open Wide SA
 			<fileset dir="${classes.dir}" includes="**" />
 			<!-- Adding the source -->
 			<fileset dir="${src.dir}" includes="**" />
+		   <!-- manifest -->
+		   <manifest>
+		    <attribute name="Built-By" value="Marc Dutoo"/>
+		    <section name="${project.name}">
+		      <attribute name="Specification-Title" value="${project.name}"/>
+		      <attribute name="Specification-Version" value="${version}"/>
+		      <attribute name="Specification-Vendor" value="Open Wide SA"/>
+		      <attribute name="Implementation-Title" value="fr.openwide.talendalfresco"/>
+		      <attribute name="Implementation-Version" value="${version} ${TODAY}"/> 
+		      <attribute name="Implementation-Vendor" value="Open Wide SA"/>
+		    </section>
+		  </manifest>
+
 		</jar>
 	</target>
 
@@ -52,10 +65,15 @@ Copyright (C) 2008 Open Wide SA
 	</target>
 
 
-	<target name="export" depends="prepare">
+	<target name="export" depends="deploy">
+	   <!-- web app dir -->
 		<copy todir="${build.dir}/export">
 			<fileset dir="${web.dir}" includes="**" />
 		</copy>
+      <!-- doc -->
+      <copy todir="${build.dir}/export">
+         <fileset dir="${basedir}" includes="*.txt" />
+      </copy>
 		<!-- WEB-INF/classes only useful for logging conf -->
 		<!-- copy todir="${build.dir}/export/WEB-INF/classes">
 			<fileset dir="${conf.dir}" includes="**" />
@@ -69,9 +87,9 @@ Copyright (C) 2008 Open Wide SA
 	</target>
 
 	<target name="package-extension" depends="export">
-			      <delete file="${package.file.zip}" />
-			      <zip destfile="${package.file.zip}">
-			         <zipfileset dir="${build.dir}/export" />
-			      </zip>
-			   </target>
+      <delete file="${package.file.zip}" />
+      <zip destfile="${package.file.zip}">
+         <zipfileset dir="${build.dir}/export" />
+      </zip>
+   </target>
 </project>

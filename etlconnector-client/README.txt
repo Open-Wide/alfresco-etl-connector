@@ -51,23 +51,27 @@ Alfresco installation, ex. $ALF_HOME/tomcat/webapps/alfresco/WEB-INF/lib
 Test
    * you can test it by using the samples provided in the companion project
 etlconnector-samples , and a compatible ETL like Talend 3.1 on the client side.
-   * for the quitus sample, using Talend :
+   * for the Quitus sample, using Talend :
    * start the Alfresco server (after having installed the ETL Connector extension)
    * import the etlconnector-samples/quitus/GED_TECHNIQUE.acp document package
-in the company home folder, using the Alfresco administration web interface
+in a new "GED TECHNIQUE" folder within the company home folder, using the
+custom action wizard in the Alfresco web interface
    * start Talend
    * import the etlconnector-samples/quitus/talend/ALFRESCO_ETLCONNECTOR_QUITUS
 as a Talend workspace project
-   * open the single Talend document import job
-   * run it in Talend : the document tree has been imported in Alfresco
+   * open the single Talend document import job ("ALFRESCO IMPORT_QUITUS 0.1")
+   * set the PATH_SOURCE global context variable of the job to the location of the
+etlconnector-samples/quitus/talend/ALFRESCO_ETLCONNECTOR_QUITUS folder
+   * run it in Talend : the complex document tree has been imported in Alfresco,
+including custom metadata and associations
 
 
 Documentation
 --------------
 ETL Connector
-   * Project page and forums at http://forge.alfresco.com/projects/etlconnector/
+   * Project page, news and forums at http://forge.alfresco.com/projects/etlconnector/
+   * Website and documentation at http://knowledge.openwide.fr/bin/view/Main/AlfrescoETLConnector
    * Download page at http://forge.alfresco.com/frs/?group_id=206
-   * Website at http://knowledge.openwide.fr/bin/view/Main/AlfrescoETLConnector
    
 Using ETL Connector with Talend
    * Talend documentation at Talend 3.1 manual at http://www.talend.com/resources/documentation.php
@@ -76,10 +80,26 @@ Using ETL Connector with Talend
    * Presentation by Open Wide (French) at http://www.openwide.fr/index.php/Open-Wide/Lab/Contributions/Alfresco-Meetup-ETL-Connector-Talend
 
 
-Build - ETL client library
---------------------------
-   * provide the project with the java 1.5 dependencies
+For developers
+--------------
+Alfresco Server Extension architecture
+   * builds on the existing Alfresco Content Package (ACP) import
+   * enriches it with : import of each node in its own transaction,better
+name path addressing, full error logs, custom import strategies allowing
+creation vs update import modes
+   * XML REST / HTTP server implemented as Alfresco web Commands (though
+a Java webscript would be a viable alternative today)
+
+Building the Alfresco Server Extension
+   * provide the etlconnector-alfresco Eclipse project with the Alfresco SDK
+and java 1.5 dependencies
+   * run Ant on the given build.xml
+   * the ETL Connector Server release is in build/export/ , ready to be
+added to an Alfresco installation
+
+Building the ETL client library
+   * provide the etlconnector-client Eclipse project with the java 1.5 dependencies
    * run Ant on the given build.xml
    * the ETL Connector Client release is in build/export/
-   * you're a developer and you want to integrate it in an ETL ?
-Ask questions on the forums at http://forge.alfresco.com/projects/etlconnector/
+   * you want to integrate it in an ETL ? Ask questions on the forums
+at http://forge.alfresco.com/projects/etlconnector/
