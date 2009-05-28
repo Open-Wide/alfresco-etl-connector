@@ -34,25 +34,31 @@ License
 Installation
 ------------
 Compatible Alfresco releases
-   * validated with 2.1 Entreprise for Tomcat
+   * *validated with 2.1 Entreprise for Tomcat*
    * should work with all 2.x Alfresco releases
    * reported to work on Labs 2.9b
    
 Compatible ETLs
-   * Talend 3.1, using the tAlfrescoOutput component - http://www.talend.fr
+   * *Talend 3.1*, using the tAlfrescoOutput component - http://www.talend.fr
 
 Installation
-   * get ETL Connector from a compatible ETL release, or from
-http://forge.alfresco.com/projects/etlconnector/ 
-   * put the etlconnector-alfresco*.jar file in the WEB-INF/lib of your
-Alfresco installation, ex. $ALF_HOME/tomcat/webapps/alfresco/WEB-INF/lib
+   * client side (ETL tool) : *get a compatible ETL tool release (see above)*
+   * server-side (Alfresco repository) : get it from
+http://forge.alfresco.com/frs/?group_id=206 . Alternatively, it may be provided
+in compatible ETL release bundles.
+   * put the etlconnector-alfresco*.jar file in the WEB-INF/lib of your Alfresco
+installation, ex. $ALF_HOME/tomcat/webapps/alfresco/WEB-INF/lib
    * restart alfresco
    
 Test
-   * you can test it by using the samples provided in the companion project
+   * You can test it by using the samples provided in the companion project
 etlconnector-samples , and a compatible ETL like Talend 3.1 on the client side.
-   * for the Quitus sample, using Talend :
-   * start the Alfresco server (after having installed the ETL Connector extension)
+
+*For the Quitus sample, using Talend* :
+   * put the etlconnector-samples*jar in WEB-INF/lib in your alfresco web
+application
+   * start the Alfresco server (after having installed the ETL Connector
+extension)
    * import the etlconnector-samples/quitus/GED_TECHNIQUE.acp document package
 in a new "GED TECHNIQUE" folder within the company home folder, using the
 custom action wizard in the Alfresco web interface
@@ -60,8 +66,9 @@ custom action wizard in the Alfresco web interface
    * import the etlconnector-samples/quitus/talend/ALFRESCO_ETLCONNECTOR_QUITUS
 as a Talend workspace project
    * open the single Talend document import job ("ALFRESCO IMPORT_QUITUS 0.1")
-   * set the PATH_SOURCE global context variable of the job to the location of the
-etlconnector-samples/quitus/talend/ALFRESCO_ETLCONNECTOR_QUITUS folder
+   * click in the left panel on Context > PATHS 0.1 to open the configuration
+dialog and there set the PATH_SOURCE variable of the job to the location of the
+etlconnector-samples/quitus folder
    * run it in Talend : the complex document tree has been imported in Alfresco,
 including custom metadata and associations
 
