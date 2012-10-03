@@ -146,7 +146,7 @@ public class AlfrescoRestClient {
          XMLEventReader xmlReader = null;
          try {
             xmlReader = XmlHelper.createXMLEventReader(
-                  new ByteArrayInputStream(method.getResponseBody()),
+                  method.getResponseBodyAsStream(),
                   this.restEncoding);
            
             clientCommand.handleResponse(xmlReader);
