@@ -23,6 +23,7 @@ package fr.openwide.talendalfresco.acpxml;
 
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -236,27 +237,50 @@ public class AcpXmlWriter {
     */
    public void writeProperty(String propertyName, String propertyType, Object value) throws AcpXmlException {
       try {
-         xmlWriter.writeStartElement(propertyName); // "cm:name"
-         
          if (value instanceof List) {
             // multivalued property ; or based on MULTIPLE TODO in model
+        	 
+         	// converting it to Strings first, to prevent any error during actual writing
+      	   List<Object> values = (List<Object>) value;
+            ArrayList<String> stringValues = new ArrayList<String>(values.size());
+            try {
+               for (Object currentValue : (List<Object>) values) {
+                  stringValues.add(valueToString(currentValue, propertyType));
+               }
+            } catch (AcpXmlException acpxmlex) {
+               throw new AcpXmlException("Aborted writing"
+                     + " multi valued property " + propertyName, acpxmlex);
+            }
+
+            // actual writing
+            xmlWriter.writeStartElement(propertyName); // "cm:name"
             xmlWriter.writeStartElement("view:values");
-            for (Object currentValue : (List<Object>) value) {
+            for (String stringValue : stringValues) {
                xmlWriter.writeStartElement("view:value");
-               String stringValue = valueToString(currentValue, propertyType);
                xmlWriter.writeCharacters(stringValue); // "/cm:generalclassifiable/cm:Languages/cm:French"
                xmlWriter.writeEndElement(); // end view:value
             }
             xmlWriter.writeEndElement(); // end view:values
+            xmlWriter.writeEndElement();
 
          } else if (value != null) {
             // single valued property (or multiple property with only one value)
-            String stringValue = valueToString(value, propertyType);
+
+            // converting it to Strings first, to prevent any error during actual writing
+            String stringValue;
+            try {
+               stringValue = valueToString(value, propertyType);
+            } catch (AcpXmlException acpxmlex) {
+               throw new AcpXmlException("Aborted writing"
+                     + " single valued property " + propertyName, acpxmlex);
+            }
+
+            // actual writing
+            xmlWriter.writeStartElement(propertyName); // "cm:name"
             xmlWriter.writeCharacters(stringValue); // "my_file_writer.pdf" ; NB. CDATA works, but rather using auto escaping
+            xmlWriter.writeEndElement();
             
          } // else null : don't write it
-         
-         xmlWriter.writeEndElement();
          
       } catch (XMLStreamException e) {
          throw new AcpXmlException("XML writing error when writing content", e);
@@ -319,41 +343,49 @@ public class AcpXmlWriter {
       String associationName = associationMappings.get("NAME");
       writeAssociation(associationName, value);
    }
-   public void writeAssociation(String associationName,
-         Object value) throws AcpXmlException {
+   public void writeAssociation(String associationName, Object value) throws AcpXmlException {
       try {
-         xmlWriter.writeStartElement(associationName); // "cm:name"
          if (value instanceof List) {
             // multivalued asso
-            for (Object currentNamePath : (List<Object>) value) {
-               if (currentNamePath instanceof String) {
-                  xmlWriter.writeStartElement("view:reference");
-                  xmlWriter.writeAttribute("view:pathref", AcpXmlUtil.toNamePathRef((String) currentNamePath));
-                  xmlWriter.writeEndElement(); // end reference
-                  continue;
-               }
-               throw new AcpXmlException("Reference value " + currentNamePath
-                     + " of multi valued association " + associationName
-                     + " should be of type String");
+
+            // converting it to Strings first, to prevent any error during actual writing
+            List<String> valueNamePathes;
+            try {
+               valueNamePathes = AcpXmlUtil.toStringList((List<Object>) value);
+            } catch (AcpXmlException acpxmlex) {
+               throw new AcpXmlException("Aborted writing" + " multi valued association " + associationName, acpxmlex);
             }
-            
-         } else {
-            // single valued association (or multiple association with only one value)
-            if (value instanceof String) {
+
+            // actual writing
+            xmlWriter.writeStartElement(associationName); // "cm:contains"
+            for (Object currentNamePath : valueNamePathes) {
                xmlWriter.writeStartElement("view:reference");
-               xmlWriter.writeAttribute("view:pathref", AcpXmlUtil.toNamePathRef((String) value));
+               xmlWriter.writeAttribute("view:pathref", AcpXmlUtil.toNamePathRef((String) currentNamePath));
                xmlWriter.writeEndElement(); // end reference
             }
-            throw new AcpXmlException("Reference value " + value + " of association "
-                  + associationName + " should be of type String");
+            xmlWriter.writeEndElement(); // end association
+
+         } else {
+            // single valued association (or multiple association with only one value)
+
+            // converting it to String first, to prevent any error during actual writing
+            if (!(value instanceof String)) {
+               throw new AcpXmlException("Reference value " + value + " of association " + associationName + " should be of type String");
+            }
+
+            // actual writing
+            xmlWriter.writeStartElement(associationName); // "cm:contains"
+            xmlWriter.writeStartElement("view:reference");
+            xmlWriter.writeAttribute("view:pathref", AcpXmlUtil.toNamePathRef((String) value));
+            xmlWriter.writeEndElement(); // end reference
+            xmlWriter.writeEndElement(); // end association
          }
-         xmlWriter.writeEndElement(); // end association
-      
+
       } catch (XMLStreamException e) {
          throw new AcpXmlException("XML writing error when writing content", e);
       }
    }
-   
+
    /**
     * containment association.
     * Stacks up path name. Requires the "cm:name" property to have already been set.

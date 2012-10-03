@@ -22,6 +22,7 @@
 package fr.openwide.talendalfresco.acpxml;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 
@@ -67,5 +68,25 @@ public class AcpXmlUtil {
       sbuf.append("}");
       return sbuf.toString();
    }
+
+   /**
+    * Converts from an Object to a String List
+    * 
+    * @param values
+    * @return
+    * @throws AcpXmlException if a value is not a String (null not allowed)
+    */
+   public static List<String> toStringList(List<Object> values) throws AcpXmlException {
+      ArrayList<String> stringValues = new ArrayList<String>(values.size());
+      for (Object value : (List<Object>) values) {
+         if (value instanceof String) {
+            stringValues.add((String) value);
+            continue;
+         }
+         throw new AcpXmlException("Value " + value + " of list " + values + " should be of type String");
+      }
+      return stringValues;
+   }
+
    
 }
