@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Open Wide SA
+ * Copyright (C) 2008-2012 Open Wide SA
  *  
  * This library is free software; you can redistribute 
  * it and/or modify it under the terms of version 2.1 of 
@@ -16,7 +16,7 @@
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
  * Boston, MA  02111-1307  USA
  * 
- * More information at http://forge.alfresco.com/projects/etlconnector/
+ * More information at http://knowledge.openwide.fr/bin/view/Main/AlfrescoETLConnector/
  */
 
 package fr.openwide.talendalfresco.rest.client.importer;
@@ -58,7 +58,10 @@ import fr.openwide.talendalfresco.rest.XmlHelper;
  */
 public class RestImportFileTest extends TestCase {
 
-   private int timeout;
+	// file path is relative to project
+   private static final String SAMPLE_SINGLE_FILE_PATH = "../etlconnector-alfresco/sample/single_file.xml";
+
+	private int timeout;
 
    private String serverUrl;
    private String commandServletUrl;
@@ -108,8 +111,7 @@ public class RestImportFileTest extends TestCase {
       try {
          //method.setRequestBody(new NameValuePair[] {
          //      new NameValuePair("path", "/app:company_home") });
-         FileInputStream acpXmlIs = new FileInputStream(
-            "/home/mdutoo/dev/workspace/talendalfresco-alfresco/sample/single_file.xml");
+         FileInputStream acpXmlIs = new FileInputStream(SAMPLE_SINGLE_FILE_PATH);
          InputStreamRequestEntity entity = new InputStreamRequestEntity(acpXmlIs);
          //InputStreamRequestEntity entity = new InputStreamRequestEntity(acpXmlIs, "text/xml; charset=ISO-8859-1");
          method.setRequestEntity(entity);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Open Wide SA
+ * Copyright (C) 2008-2012 Open Wide SA
  *  
  * This library is free software; you can redistribute 
  * it and/or modify it under the terms of version 2.1 of 
@@ -16,7 +16,7 @@
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
  * Boston, MA  02111-1307  USA
  * 
- * More information at http://forge.alfresco.com/projects/etlconnector/
+ * More information at http://knowledge.openwide.fr/bin/view/Main/AlfrescoETLConnector/
  */
 
 package fr.openwide.talendalfresco.acpxml;

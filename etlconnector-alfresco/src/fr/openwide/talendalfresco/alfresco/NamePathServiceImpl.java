@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Open Wide SA
+ * Copyright (C) 2008-2012 Open Wide SA
  *
  * This program is FREE software. You can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,7 +15,7 @@
  * along with this program. If not, write to the Free Software Foundation,
  * Inc. ,59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  * 
- * More information at http://forge.alfresco.com/projects/etlconnector/
+ * More information at http://knowledge.openwide.fr/bin/view/Main/AlfrescoETLConnector/
  *
  */
 package fr.openwide.talendalfresco.alfresco;
@@ -46,30 +46,41 @@ public class NamePathServiceImpl implements NamePathService {
    protected NodeService nodeService;
    protected SearchService searchService;
    
-   public NamePathServiceImpl() {
+   protected boolean alwaysUseDb = true;
+
+
+	public NamePathServiceImpl() {
       
    }
-   
 
+	/**
+	 * Resolves given namePath using server File.separator
+	 * @see resolveNamePath(String, String)
+	 * @see getChildByPathName(String, NodeRef, QName)
+	 */
    public NodeRef resolveNamePath(String namePath) {
       return resolveNamePath(namePath, File.pathSeparator);
    }
+   /**
+    * Resolves given namePath from root
+    * @see resolveNamePath(String, String, NodeRef)
+    */
    public NodeRef resolveNamePath(String namePath, String pathDelimiter) {
       NodeRef companyHomeNodeRef = new NodeRef(Repository.getStoreRef(), Application.getCompanyRootId());
       return resolveNamePath(namePath, pathDelimiter, companyHomeNodeRef);
    }
-   
    /**
-    * Uses Lucene (rather than db) to avoid loading a distant subtree only to get the referenced node.
-    * Single char pathNames are resolved using db (lucene can't) with a cm:contains child association.
+    * Resolves given namePath using default cm:contains association
+    * @see resolveNamePath(String, String, NodeRef, QName)
+	 * @see getChildByPathName(String, NodeRef, QName)
     */
    public NodeRef resolveNamePath(String namePath, String pathDelimiter, NodeRef rootNodeRef) {
       return resolveNamePath(namePath, pathDelimiter, rootNodeRef, ContentModel.ASSOC_CONTAINS);
    }
    /**
-    * Uses Lucene (rather than db) to avoid loading a distant subtree only to get the referenced node.
-    * @param targetLocationChildAssociationTypeQName used to resolve single char pathNames
-    * (lucene can't) with db
+    * Resolves given namePath
+    * @param targetLocationChildAssociationTypeQName
+	 * @see getChildByPathName(String, NodeRef, QName)
     */
    public NodeRef resolveNamePath(String namePath, String pathDelimiter, NodeRef rootNodeRef,
          QName targetLocationChildAssociationTypeQName) {
@@ -83,6 +94,8 @@ public class NamePathServiceImpl implements NamePathService {
    }
 
    /**
+    * @obsolete rather use db (nodeService), else custom lucene analyzers make it fail, e.g.
+    * like those for French locale in 3.2 which remove ending "s".
     * Uses Lucene (rather than db) to avoid loading a distant subtree only to get the referenced node.
     * @param pathName must be not null and at least 2 chars long (lucene doesn't index single chars,
     * in this case use the other method or nodeService)
@@ -109,13 +122,19 @@ public class NamePathServiceImpl implements NamePathService {
    }
 
    /**
-    * Uses db for 1 char length pathName and lucene for others
+    * If not alwaysUseDb (which is not advised since custom lucene analyzers may make it fail,
+    * e.g. like those for French locale in 3.2 which remove ending "s"), uses lucene when char
+    * length pathName > 1 (else lucene can't) as an optimization.
     * @param pathName not null
     * @param parentNodeRef
     * @return
     */
    public NodeRef getChildByPathName(String pathName, NodeRef currentNodeRef,
          QName targetLocationChildAssociationTypeQName) {
+   	if (alwaysUseDb) {
+         return nodeService.getChildByName(currentNodeRef,
+               targetLocationChildAssociationTypeQName, pathName);
+   	}
       switch (pathName.length()) {
       case 0 :
          // happens when //
@@ -159,5 +178,9 @@ public class NamePathServiceImpl implements NamePathService {
    public void setSearchService(SearchService searchService) {
       this.searchService = searchService;
    }
+   
+   public void setAlwaysUseDb(boolean alwaysUseDb) {
+		this.alwaysUseDb = alwaysUseDb;
+	}
    
 }

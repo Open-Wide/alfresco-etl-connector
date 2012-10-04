@@ -3,8 +3,8 @@
  
  <!--
 ETL Connector for Alfresco - Alfresco Server Extension
-http://forge.alfresco.com/projects/etlconnector/
-Copyright (C) 2008 Open Wide SA
+http://knowledge.openwide.fr/Main/AlfrescoETLConnector
+Copyright (C) 2008-2012 Open Wide SA
 -->
 <beans>
 
@@ -68,6 +68,9 @@ Copyright (C) 2008 Open Wide SA
         </property>
         <property name="searchService">
             <ref bean="searchService" />
+        </property>
+        <property name="alwaysUseDb">
+            <value>true</value>
         </property>
     </bean>
 

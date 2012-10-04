@@ -1,10 +1,10 @@
 <!--
 ETL Connector for Alfresco - Samples
-http://forge.alfresco.com/projects/etlconnector/
-Copyright (C) 2008 Open Wide SA
+http://knowledge.openwide.fr/bin/view/Main/AlfrescoETLConnector/
+Copyright (C) 2008-2012 Open Wide SA
 -->
 
-<project default="deploy" basedir="." name="etlconnector-samples">
+<project default="deploy" basedir="." name="etlconnector-alfresco-samples">
 	<property file="./build.properties" />
 
 	<!-- =================================================================== -->
@@ -25,20 +25,24 @@ Copyright (C) 2008 Open Wide SA
 
 
 	<target name="jar" depends="prepare">
-		<jar jarfile="${build.dir}/${project.name}_${version}.jar" update="false"  >
+		<tstamp>
+			<format property="build.time" pattern="dd MMM yyyy - HH:mm:ss" locale="en,US" />
+		</tstamp>
+			
+		<jar jarfile="${jar.path}" update="false"  >
 			<!-- Adding the alfresco classes -->
 			<fileset dir="${classes.dir}" includes="**" />
 			<!-- Adding the source -->
 			<fileset dir="${src.dir}" includes="**" />
          <!-- manifest -->
          <manifest>
-          <attribute name="Built-By" value="Marc Dutoo"/>
+          <attribute name="Built-By" value="${user.name}"/>
           <section name="${project.name}">
-            <attribute name="Specification-Title" value="${project.name}"/>
+            <attribute name="Specification-Title" value="etlconnector-alfresco${alfresco.version}-samples_${version}.jar"/>
             <attribute name="Specification-Version" value="${version}"/>
             <attribute name="Specification-Vendor" value="Habitat 76"/>
             <attribute name="Implementation-Title" value="${project.name}"/>
-            <attribute name="Implementation-Version" value="${version} ${TODAY}"/> 
+            <attribute name="Implementation-Version" value="${version} ${build.time}"/> 
             <attribute name="Implementation-Vendor" value="Habitat 76"/>
           </section>
         </manifest>
@@ -47,13 +51,11 @@ Copyright (C) 2008 Open Wide SA
 
 
 	<target name="deploy" depends="jar">
-		<copy todir="${alfresco.web.dir}/WEB-INF/lib"
-				file="${build.dir}/${project.name}_${version}.jar" />
+		<copy todir="${alfresco.web.dir}/WEB-INF/lib" file="${jar.path}" />
 	</target>
 
 	<target name="package-standalone" depends="deploy">
-		<copy todir="${build.dir}/export"
-				file="${build.dir}/${project.name}_${version}.jar" />
+		<copy todir="${build.dir}/export" file="${jar.path}" />
 		<copy todir="${build.dir}/export">
 			<fileset dir="${lib.dir}" includes="**" />
 		</copy>

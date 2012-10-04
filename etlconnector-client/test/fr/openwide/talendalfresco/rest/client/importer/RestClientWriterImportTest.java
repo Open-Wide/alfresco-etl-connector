@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Open Wide SA
+ * Copyright (C) 2008-2012 Open Wide SA
  *  
  * This library is free software; you can redistribute 
  * it and/or modify it under the terms of version 2.1 of 
@@ -16,13 +16,14 @@
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
  * Boston, MA  02111-1307  USA
  * 
- * More information at http://forge.alfresco.com/projects/etlconnector/
+ * More information at http://knowledge.openwide.fr/bin/view/Main/AlfrescoETLConnector/
  */
 
 package fr.openwide.talendalfresco.rest.client.importer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -46,6 +47,7 @@ import fr.openwide.talendalfresco.rest.client.RestClientException;
 public class RestClientWriterImportTest extends TestCase {
    
    private AlfrescoRestClient alfrescoRestClient;
+	private String serverFileSeparator = File.separator; // to change depending on the server
 
 
    public RestClientWriterImportTest() {
@@ -119,7 +121,7 @@ public class RestClientWriterImportTest extends TestCase {
       
       ByteArrayInputStream acpXmlIs = new ByteArrayInputStream(content.getBytes());
       
-      ClientImportCommand cmd = new ClientImportCommand("/Alfresco", acpXmlIs);
+      ClientImportCommand cmd = new ClientImportCommand(serverFileSeparator, acpXmlIs);
    
       // Execute the command.
       alfrescoRestClient.execute(cmd);

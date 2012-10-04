@@ -58,7 +58,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 
 /**
- * [talendalfresco] "almost" copy of ImportComponent to allow extending it.
+ * [talendalfresco] "almost" copy of ViewParser v2.1c to allow extending it.
  * Changes : changed private to protected to allow override for :
  * startReference(), to allow catching non existing asso refs errors
  * ParserContext

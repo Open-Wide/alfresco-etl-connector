@@ -1,7 +1,7 @@
 <!--
 ETL Connector for Alfresco - Alfresco server extension
-http://forge.alfresco.com/projects/etlconnector/
-Copyright (C) 2008 Open Wide SA
+http://knowledge.openwide.fr/bin/view/Main/AlfrescoETLConnector/
+Copyright (C) 2008-2012 Open Wide SA
 -->
 
 <project default="deploy" basedir="." name="etlconnector-alfresco">
@@ -19,7 +19,7 @@ Copyright (C) 2008 Open Wide SA
 		<mkdir dir="${classes.dir}" />
 		<mkdir dir="${build.dir}/export" />
 	</target>
-	
+
 	<target name="prepare" depends="init-project">
 		<delete dir="${build.dir}/export" />
 		<mkdir dir="${build.dir}/export" />
@@ -30,23 +30,27 @@ Copyright (C) 2008 Open Wide SA
 
 
 	<target name="jar" depends="prepare">
-		<jar jarfile="${build.dir}/export/WEB-INF/lib/${project.name}_${version}.jar"  update="false"  >
+		<tstamp>
+			<format property="build.time" pattern="dd MMM yyyy - HH:mm:ss" locale="en,US" />
+		</tstamp>
+
+		<jar jarfile="${jar.path}"  update="false"  >
 			<!-- Adding the alfresco classes -->
 			<fileset dir="${classes.dir}" includes="**" />
 			<!-- Adding the source -->
 			<fileset dir="${src.dir}" includes="**" />
-		   <!-- manifest -->
-		   <manifest>
-		    <attribute name="Built-By" value="Marc Dutoo"/>
-		    <section name="${project.name}">
-		      <attribute name="Specification-Title" value="${project.name}"/>
-		      <attribute name="Specification-Version" value="${version}"/>
-		      <attribute name="Specification-Vendor" value="Open Wide SA"/>
-		      <attribute name="Implementation-Title" value="fr.openwide.talendalfresco"/>
-		      <attribute name="Implementation-Version" value="${version} ${TODAY}"/> 
-		      <attribute name="Implementation-Vendor" value="Open Wide SA"/>
-		    </section>
-		  </manifest>
+			<!-- manifest -->
+			<manifest>
+				<attribute name="Built-By" value="${user.name}"/>
+				<section name="${project.name}">
+					<attribute name="Specification-Title" value="${project.name}${alfresco.version}"/>
+					<attribute name="Specification-Version" value="${version}"/>
+					<attribute name="Specification-Vendor" value="Open Wide SA"/>
+					<attribute name="Implementation-Title" value="fr.openwide.talendalfresco"/>
+					<attribute name="Implementation-Version" value="${version} ${build.time}"/>
+					<attribute name="Implementation-Vendor" value="Open Wide SA"/>
+				</section>
+			</manifest>
 
 		</jar>
 	</target>
@@ -60,36 +64,29 @@ Copyright (C) 2008 Open Wide SA
 		<!-- copy todir="${build.dir}/export/WEB-INF/classes">
 			<fileset dir="${conf.dir}" includes="**" />
 		</copy -->
-		<copy todir="${alfresco.web.dir}/WEB-INF/lib"
-				file="${build.dir}/export/WEB-INF/lib/${project.name}_${version}.jar" />
+		<copy todir="${alfresco.web.dir}/WEB-INF/lib" file="${jar.path}" />
 	</target>
 
 
 	<target name="export" depends="deploy">
-	   <!-- web app dir -->
+		<!-- web app dir -->
 		<copy todir="${build.dir}/export">
 			<fileset dir="${web.dir}" includes="**" />
 		</copy>
-      <!-- doc -->
-      <copy todir="${build.dir}/export">
-         <fileset dir="${basedir}" includes="*.txt" />
-      </copy>
+		<!-- doc -->
+		<copy todir="${build.dir}/export">
+			<fileset dir="${basedir}" includes="*.txt" />
+		</copy>
 		<!-- WEB-INF/classes only useful for logging conf -->
 		<!-- copy todir="${build.dir}/export/WEB-INF/classes">
 			<fileset dir="${conf.dir}" includes="**" />
 		</copy -->
-		<jar jarfile="${build.dir}/export/WEB-INF/lib/${project.name}_${version}.jar"  update="false"  >
-			<!-- Adding the alfresco classes -->
-			<fileset dir="${classes.dir}" includes="**" />
-			<!-- Adding the source -->
-			<fileset dir="${src.dir}" includes="**" />
-		</jar>
 	</target>
 
 	<target name="package-extension" depends="export">
-      <delete file="${package.file.zip}" />
-      <zip destfile="${package.file.zip}">
-         <zipfileset dir="${build.dir}/export" />
-      </zip>
-   </target>
+		<delete file="${package.file.zip}" />
+		<zip destfile="${package.file.zip}">
+			<zipfileset dir="${build.dir}/export" />
+		</zip>
+	</target>
 </project>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Open Wide SA
+ * Copyright (C) 2008-2012 Open Wide SA
  *  
  * This library is free software; you can redistribute 
  * it and/or modify it under the terms of version 2.1 of 
@@ -16,7 +16,7 @@
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
  * Boston, MA  02111-1307  USA
  * 
- * More information at http://forge.alfresco.com/projects/etlconnector/
+ * More information at http://knowledge.openwide.fr/bin/view/Main/AlfrescoETLConnector/
  */
 
 package fr.openwide.talendalfresco.acpxml;
@@ -280,10 +280,10 @@ public class AcpXmlWriter {
             xmlWriter.writeCharacters(stringValue); // "my_file_writer.pdf" ; NB. CDATA works, but rather using auto escaping
             xmlWriter.writeEndElement();
             
-         } // else null : don't write it
+         } // else null : don't write it (allowed to ease mapping from etl)
          
       } catch (XMLStreamException e) {
-         throw new AcpXmlException("XML writing error when writing content", e);
+         throw new AcpXmlException("XML writing error when writing content : property " + propertyName, e);
       }
    }
    
@@ -323,7 +323,7 @@ public class AcpXmlWriter {
          */
          
       } else {
-         // other types : just stringify
+         // other types : only stringify
          return String.valueOf(value); // "my_file_writer.pdf" ; NB. CDATA works, but rather using auto escaping
       }
    }
@@ -365,7 +365,7 @@ public class AcpXmlWriter {
             }
             xmlWriter.writeEndElement(); // end association
 
-         } else {
+         } else if (value != null) {
             // single valued association (or multiple association with only one value)
 
             // converting it to String first, to prevent any error during actual writing
@@ -379,10 +379,11 @@ public class AcpXmlWriter {
             xmlWriter.writeAttribute("view:pathref", AcpXmlUtil.toNamePathRef((String) value));
             xmlWriter.writeEndElement(); // end reference
             xmlWriter.writeEndElement(); // end association
-         }
+            
+         } // else null : don't write it (allowed to ease mapping from etl)
 
       } catch (XMLStreamException e) {
-         throw new AcpXmlException("XML writing error when writing content", e);
+         throw new AcpXmlException("XML writing error when writing content : association " + associationName, e);
       }
    }
 

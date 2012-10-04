@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Open Wide SA
+ * Copyright (C) 2008-2012 Open Wide SA
  *
  * This program is FREE software. You can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,7 +15,7 @@
  * along with this program. If not, write to the Free Software Foundation,
  * Inc. ,59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  * 
- * More information at http://forge.alfresco.com/projects/etlconnector/
+ * More information at http://knowledge.openwide.fr/bin/view/Main/AlfrescoETLConnector/
  *
  */
 package fr.openwide.talendalfresco.rest.server;

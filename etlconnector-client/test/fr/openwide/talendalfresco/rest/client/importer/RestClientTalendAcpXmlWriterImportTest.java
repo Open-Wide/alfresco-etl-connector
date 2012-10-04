@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Open Wide SA
+ * Copyright (C) 2008-2012 Open Wide SA
  *  
  * This library is free software; you can redistribute 
  * it and/or modify it under the terms of version 2.1 of 
@@ -16,12 +16,13 @@
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
  * Boston, MA  02111-1307  USA
  * 
- * More information at http://forge.alfresco.com/projects/etlconnector/
+ * More information at http://knowledge.openwide.fr/bin/view/Main/AlfrescoETLConnector/
  */
 
 package fr.openwide.talendalfresco.rest.client.importer;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,172 +37,198 @@ import fr.openwide.talendalfresco.rest.client.AlfrescoRestClient;
 import fr.openwide.talendalfresco.rest.client.ClientImportCommand;
 import fr.openwide.talendalfresco.rest.client.RestClientException;
 
-
 /**
- * Tests the Talend content import driver.
- * Requires a running alfresco with talendalfresco ext.
+ * Tests the Talend content import driver. Requires a running alfresco with
+ * talendalfresco ext.
  * 
  * @author Marc Dutoo - Open Wide SA
- *
+ * 
  */
 public class RestClientTalendAcpXmlWriterImportTest extends TestCase {
-   
-   private AlfrescoRestClient alfrescoRestClient;
 
+	// file path is relative to project
+	private static final Object CLASSPATH_FILE_PATH = "classpath:alfresco/bootstrap/webscripts/readme.html";
+	private String serverFileSeparator = File.separator; // to change depending on the server
+	
+	private AlfrescoRestClient alfrescoRestClient;
+	private TalendAcpXmlWriter talendAcpXmlWriter;
 
-   public RestClientTalendAcpXmlWriterImportTest() {
-      super(RestClientTalendAcpXmlWriterImportTest.class.getName());
-   }
+	public RestClientTalendAcpXmlWriterImportTest() {
+		super(RestClientTalendAcpXmlWriterImportTest.class.getName());
+	}
 
-   @Override
-   protected void setUp() throws Exception {
-      alfrescoRestClient = new AlfrescoRestClient();
-      alfrescoRestClient.setTimeout(5000);
-      // default server : localhost
-      alfrescoRestClient.login("admin", "admin");
-   }
+	@Override
+	protected void setUp() throws Exception {
+		alfrescoRestClient = new AlfrescoRestClient();
+		alfrescoRestClient.setTimeout(5000);
+		// default server : localhost
+		alfrescoRestClient.login("admin", "admin");
+		talendAcpXmlWriter = new TalendAcpXmlWriter();
+	}
 
-   @Override
-   protected void tearDown() throws Exception {
-      alfrescoRestClient.logout();
-      alfrescoRestClient = null;
-   }
-   
-   public void testWriterImport() throws RestClientException {
-      TalendAcpXmlWriter talendAcpXmlWriter = new TalendAcpXmlWriter();
-      talendAcpXmlWriter.setMappedContentNamespaces(new ArrayList<Map<String, String>>() { { 
-         add(new HashMap<String, String>() { {
-            put("PREFIX", "cm");
-            put("URI", "http://www.alfresco.org/model/content/1.0");
-            } });
-            add(new HashMap<String, String>() { {
-               put("PREFIX", "app");
-               put("URI", "http://www.alfresco.org/model/application/1.0");
-               } });
-         } });
-      talendAcpXmlWriter.setAlfrescoType("cm:content");
-      talendAcpXmlWriter.setMappedAlfrescoAspects(new ArrayList<Map<String, String>>() { {
-         add(new HashMap<String, String>() { {
-            put("NAME", "app:uifacets");
-            } }); } });
-      talendAcpXmlWriter.setConfigurePermission(true);
-      //talendAcpXmlWriter.setPermissionOnDocumentAndNotContainer(false); // default
-      talendAcpXmlWriter.setInheritPermissions(false);
-      /*talendAcpXmlWriter.setPermissions(new ArrayList<Map<String, String>>() { {
-         add(new HashMap<String, String>() { {
-         put("USERORGROUP", "GROUP_EVERYONE");
-         put("PERMISSION", "Consumer");
-         } }); }});*/ // not required
-      //talendAcpXmlWriter.setContainerType(containerType); // default
-      //talendAcpXmlWriter.setContainerChildAssociationType(containerChildAssociationType); // default
+	@Override
+	protected void tearDown() throws Exception {
+		alfrescoRestClient.logout();
+		alfrescoRestClient = null;
+	}
 
-      try {
-         
-         // layout under base target location :
-         // my_file_writer.pdf
-         // test2/my_file_writer.pdf
-         // test2/test1/my_file_writer.pdf
-         // test2/test1/test1/my_file_writer.pdf
-         // test2/test2/my_file_writer.pdf
+	public void testWriterImport() throws RestClientException {
+		talendAcpXmlWriter
+				.setMappedContentNamespaces(new ArrayList<Map<String, String>>() {
+					{
+						add(new HashMap<String, String>() {
+							{
+								put("PREFIX", "cm");
+								put("URI",
+										"http://www.alfresco.org/model/content/1.0");
+							}
+						});
+						add(new HashMap<String, String>() {
+							{
+								put("PREFIX", "app");
+								put("URI",
+										"http://www.alfresco.org/model/application/1.0");
+							}
+						});
+					}
+				});
+		talendAcpXmlWriter.setAlfrescoType("cm:content");
+		talendAcpXmlWriter
+				.setMappedAlfrescoAspects(new ArrayList<Map<String, String>>() {
+					{
+						add(new HashMap<String, String>() {
+							{
+								put("NAME", "app:uifacets");
+							}
+						});
+					}
+				});
+		talendAcpXmlWriter.setConfigurePermission(true);
+		// talendAcpXmlWriter.setPermissionOnDocumentAndNotContainer(false); //
+		// default
+		talendAcpXmlWriter.setInheritPermissions(false);
+		/*
+		 * talendAcpXmlWriter.setPermissions(new ArrayList<Map<String,
+		 * String>>() { { add(new HashMap<String, String>() { {
+		 * put("USERORGROUP", "GROUP_EVERYONE"); put("PERMISSION", "Consumer");
+		 * } }); }});
+		 */// not required
+		// talendAcpXmlWriter.setContainerType(containerType); // default
+		// talendAcpXmlWriter.setContainerChildAssociationType(containerChildAssociationType);
+		// // default
 
-         talendAcpXmlWriter.start();
-         
-         talendAcpXmlWriter.writeStartDocument("", new String[][] { new String[] { "GROUP_EVERYONE", "Consumer" } });
+		try {
 
-         talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() { {
-            put("NAME", "cm:name");
-            put("TYPE", "d:text");
-            } }, "my_file_writer.pdf");
-         talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() { {
-            put("NAME", "cm:content");
-            put("TYPE", "d:content");
-            } }, "classpath:alfresco/bootstrap/Alfresco-Tutorial.pdf");
+			// layout under base target location :
+			// my_file_writer.pdf
+			// test2/my_file_writer.pdf
+			// test2/test1/my_file_writer.pdf
+			// test2/test1/test1/my_file_writer.pdf
+			// test2/test2/my_file_writer.pdf
 
-         talendAcpXmlWriter.writeEndDocument();
-         
-         
-         talendAcpXmlWriter.writeStartDocument("test2", new String[][] { new String[] { "GROUP_EVERYONE", "Consumer" } });
+			talendAcpXmlWriter.start();
 
-         talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() { {
-            put("NAME", "cm:name");
-            put("TYPE", "d:text");
-            } }, "my_file_writer.pdf");
-         talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() { {
-            put("NAME", "cm:content");
-            put("TYPE", "d:content");
-            } }, "classpath:alfresco/bootstrap/Alfresco-Tutorial.pdf");
+			writeTestDocument1("");
+			writeTestDocument1("test2");
+			writeTestDocument1("test2/test1");
+			writeTestDocument1("test2/test1/test3/test1");
+			writeTestDocumentError("test2/test1/test3/test2");
+			writeTestDocument1("test2/test1/test0/test1");
+			writeTestDocument1("test2/test2");
 
-         talendAcpXmlWriter.writeEndDocument();
-         
-         
-         talendAcpXmlWriter.writeStartDocument("test2/test1", new String[][] { new String[] { "GROUP_EVERYONE", "Consumer" } });
+			talendAcpXmlWriter.close();
+		} catch (AcpXmlException e) {
+			throw new RestClientException("Error creating XML result", e);
+		}
 
-         talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() { {
-            put("NAME", "cm:name");
-            put("TYPE", "d:text");
-            } }, "my_file_writer.pdf");
-         talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() { {
-            put("NAME", "cm:content");
-            put("TYPE", "d:content");
-            } }, "classpath:alfresco/bootstrap/Alfresco-Tutorial.pdf");
+		String content = talendAcpXmlWriter.toString();
 
-         talendAcpXmlWriter.writeEndDocument();
-         
-         
-         talendAcpXmlWriter.writeStartDocument("test2/test1/test1", new String[][] { new String[] { "GROUP_EVERYONE", "Consumer" } });
+		ByteArrayInputStream acpXmlIs = new ByteArrayInputStream(content
+				.getBytes());
 
-         talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() { {
-            put("NAME", "cm:name");
-            put("TYPE", "d:text");
-            } }, "my_file_writer.pdf");
-         talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() { {
-            put("NAME", "cm:content");
-            put("TYPE", "d:content");
-            } }, "classpath:alfresco/bootstrap/Alfresco-Tutorial.pdf");
+		ClientImportCommand cmd = new ClientImportCommand(serverFileSeparator
+				+ "test1", acpXmlIs);
+		cmd.setDocumentMode(ContentImporterConfiguration.DOCUMENT_MODE_CREATE_OR_UPDATE);
 
-         talendAcpXmlWriter.writeEndDocument();
-         
-         
-         talendAcpXmlWriter.writeStartDocument("test2/test2", new String[][] { new String[] { "GROUP_EVERYONE", "Consumer" } });
+		// Execute the command.
+		alfrescoRestClient.execute(cmd);
 
-         talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() { {
-            put("NAME", "cm:name");
-            put("TYPE", "d:text");
-            } }, "my_file_writer.pdf");
-         talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() { {
-            put("NAME", "cm:content");
-            put("TYPE", "d:content");
-            } }, "classpath:alfresco/bootstrap/Alfresco-Tutorial.pdf");
+		assertTrue(RestConstants.CODE_OK.equals(cmd.getResultCode()));
+		System.out.println(cmd.toString() + " " + cmd.getResultMessage() + " "
+				+ cmd.getResultError());
 
-         talendAcpXmlWriter.writeEndDocument();
-         
-         talendAcpXmlWriter.close();
-      } catch (AcpXmlException e) {
-         throw new RestClientException("Error creating XML result", e);
-      }
-      
-      String content = talendAcpXmlWriter.toString();
-      
-      ByteArrayInputStream acpXmlIs = new ByteArrayInputStream(content.getBytes());
-      
-      ClientImportCommand cmd = new ClientImportCommand("/test1", acpXmlIs);
-      cmd.setDocumentMode(ContentImporterConfiguration.DOCUMENT_MODE_CREATE_OR_UPDATE);
-   
-      // Execute the command.
-      alfrescoRestClient.execute(cmd);
-      
-      assertTrue(RestConstants.CODE_OK.equals(cmd.getResultCode()));
-      System.out.println(cmd.toString() + " " + cmd.getResultMessage() + " " + cmd.getResultError());
-      
-      ArrayList<String[]> resultLogs = cmd.getResultLogs();
-      assertTrue(resultLogs != null);
-      //assertTrue(resultLogs.size() == 1);
-      //assertTrue(cmd.getErrorLogs().isEmpty());
-      System.out.println("Result :");
-      for (String[] resultLog : cmd.getResultLogs()) {
-         System.out.println("   " + Arrays.asList(resultLog));
-      }
-      System.out.println("\n");
-   }
-   
+		ArrayList<String[]> resultLogs = cmd.getResultLogs();
+		assertTrue(resultLogs != null);
+		assertTrue(resultLogs.size() == 16); // only if not yet imported (update does not work because no uuid)
+		assertTrue(cmd.getErrorLogs().size() == 1); // because of writeTestDocumentError
+		System.out.println("Result :");
+		for (String[] resultLog : cmd.getResultLogs()) {
+			System.out.println("   " + Arrays.asList(resultLog));
+		}
+		System.out.println("\n");
+	}
+
+	private void writeTestDocument1(String slashedPath) throws AcpXmlException {
+		String serverOsSlashedPath = patchSlashedPathForServer(slashedPath);
+
+		talendAcpXmlWriter
+				.writeStartDocument(serverOsSlashedPath,
+						new String[][] { new String[] { "GROUP_EVERYONE",
+								"Consumer" } });
+
+		talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() {
+			{
+				put("NAME", "cm:name");
+				put("TYPE", "d:text");
+			}
+		}, "my_file_writer.pdf");
+		talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() {
+			{
+				put("NAME", "cm:content");
+				put("TYPE", "d:content");
+			}
+		}, CLASSPATH_FILE_PATH);
+
+		talendAcpXmlWriter.writeEndDocument();
+	}
+
+	private void writeTestDocumentError(String slashedPath)
+			throws AcpXmlException {
+		String serverOsSlashedPath = patchSlashedPathForServer(slashedPath);
+
+		talendAcpXmlWriter
+				.writeStartDocument(serverOsSlashedPath,
+						new String[][] { new String[] { "GROUP_EVERYONE",
+								"Consumer" } });
+
+		talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() {
+			{
+				put("NAME", "cm:name");
+				put("TYPE", "d:text");
+			}
+		}, "my_file_writer.pdf");
+		
+		talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() {
+			{
+				put("NAME", "cm:content");
+				put("TYPE", "d:content");
+			}
+		}, "classpath:alfresco/bootstrap/Alfresco-Tutorial.pdfT"); // error : does not exist
+
+		talendAcpXmlWriter.writeEndDocument();
+	}
+
+	private String patchSlashedPathForServer(String slashedPath) {
+		String[] pathNames = slashedPath.split("/");
+		StringBuffer serverOsSlashedPathBuf = new StringBuffer();
+		for (String pathName : pathNames) {
+			serverOsSlashedPathBuf.append(pathName);
+			serverOsSlashedPathBuf.append(serverFileSeparator);
+		}
+		serverOsSlashedPathBuf
+				.deleteCharAt(serverOsSlashedPathBuf.length() - 1);
+		String serverOsSlashedPath = serverOsSlashedPathBuf.toString();
+		return serverOsSlashedPath;
+	}
+
 }

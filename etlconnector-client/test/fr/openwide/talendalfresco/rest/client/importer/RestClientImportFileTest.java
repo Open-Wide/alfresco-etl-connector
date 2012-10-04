@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Open Wide SA
+ * Copyright (C) 2008-2012 Open Wide SA
  *  
  * This library is free software; you can redistribute 
  * it and/or modify it under the terms of version 2.1 of 
@@ -16,11 +16,12 @@
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
  * Boston, MA  02111-1307  USA
  * 
- * More information at http://forge.alfresco.com/projects/etlconnector/
+ * More information at http://knowledge.openwide.fr/bin/view/Main/AlfrescoETLConnector/
  */
 
 package fr.openwide.talendalfresco.rest.client.importer;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,7 +42,11 @@ import fr.openwide.talendalfresco.rest.client.RestClientException;
  */
 public class RestClientImportFileTest extends TestCase {
    
-   private AlfrescoRestClient alfrescoRestClient;
+	// file path is relative to project
+   private static final String SAMPLE_SINGLE_FOLDER_FILE_PATH = "../etlconnector-alfresco/sample/single_folder_file.xml";
+	private String serverFileSeparator = File.separator; // to change depending on the server
+   
+	private AlfrescoRestClient alfrescoRestClient;
 
 
    public RestClientImportFileTest() {
@@ -98,7 +103,7 @@ public class RestClientImportFileTest extends TestCase {
          fail("ACP XML file not found " + ioex.getMessage());
       }
       
-      ClientImportCommand cmd = new ClientImportCommand("/Alfresco", acpXmlIs);;
+      ClientImportCommand cmd = new ClientImportCommand(serverFileSeparator, acpXmlIs);;
    
       // Execute the command.
       alfrescoRestClient.execute(cmd);
@@ -114,13 +119,12 @@ public class RestClientImportFileTest extends TestCase {
    public void testSingleFolderFileNamePathImport() throws RestClientException {
       FileInputStream acpXmlIs = null;
       try {
-         acpXmlIs = new FileInputStream(
-            "/home/mdutoo/dev/workspace/talendalfresco-alfresco/sample/single_folder_file.xml");
+         acpXmlIs = new FileInputStream(SAMPLE_SINGLE_FOLDER_FILE_PATH);
       } catch (IOException ioex) {
          fail("ACP XML file not found " + ioex.getMessage());
       }
       
-      ClientImportCommand cmd = new ClientImportCommand("/Alfresco", acpXmlIs);;
+      ClientImportCommand cmd = new ClientImportCommand(serverFileSeparator, acpXmlIs);;
    
       // Execute the command.
       alfrescoRestClient.execute(cmd);
