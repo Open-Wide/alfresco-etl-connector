@@ -119,10 +119,17 @@ a Java webscript would be a viable alternative today)
 
 Building the Alfresco Server Extension
    * provide the etlconnector-alfresco Eclipse project with the Alfresco SDK
-and java 1.5 dependencies
+(see which one in .classpath) and java 1.5 dependencies
    * run Ant on the given build.xml
    * the ETL Connector Server release is in build/export/ , ready to be
 added to an Alfresco installation
+   * to support a newer version of Alfresco : update ContentImporterComponentBase
+and ViewParserBase respectively with the newer ImporterComponent and ViewParser
+source code and reapply changes on them (convert all, resp. some, "private" to
+"protected") ; also update contentImporterComponent & contentViewParser Spring
+definitions in talendalfresco-services-context.xml according to their newer
+versions ; update other alfresco configuration (web.xml, web-client-config-custom.xml
+and in samples).
 
 Building the ETL client library
    * provide the etlconnector-client Eclipse project with the java 1.5 dependencies
@@ -139,6 +146,12 @@ definition files, see source at http://talendforge.org/trac/tos/browser/trunk/or
 library) and JET Java templates in source at http://talendforge.org/trac/tos/browser/trunk/org.talend.designer.components.localprovider/components/tAlfrescoOutput
    * how to build : see Talend Studio developer documentation and especially
 http://www.talendforge.org/wiki/doku.php?id=dev:run_from_svn
+
+
+Release Notes - 1.1
+-------------------
+server
+   * migrated to and tested with Alfresco 3.1 Entreprise
 
 
 Release Notes - 1.1

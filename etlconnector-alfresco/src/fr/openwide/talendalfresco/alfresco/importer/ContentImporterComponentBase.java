@@ -45,6 +45,7 @@ import org.alfresco.repo.importer.ImportParent;
 import org.alfresco.repo.importer.Importer;
 import org.alfresco.repo.importer.ImporterComponent;
 import org.alfresco.repo.importer.Parser;
+import org.alfresco.repo.importer.view.NodeContext;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
@@ -62,8 +63,6 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.XPathException;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.rule.RuleService;
-import org.alfresco.service.cmr.search.ResultSet;
-import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
@@ -91,7 +90,7 @@ import org.xml.sax.ContentHandler;
 
 
 /**
- * [talendalfresco] "almost" copy of ImportComponent v2.1c to allow extending it.
+ * [talendalfresco] "almost" copy of ImportComponent v3.1 to allow extending it.
  * Changes : changed every private to protected
  * 
  * Default implementation of the Importer Service
@@ -978,6 +977,27 @@ public class ContentImporterComponentBase
             
             return boundProperties;
         }
+        
+        /**
+         * Bind permissions - binds authorities
+         * 
+         * @param properties
+         * @return
+         */
+        protected List<AccessPermission> bindPermissions(List<AccessPermission> permissions)
+        {
+            List<AccessPermission> boundPermissions = new ArrayList<AccessPermission>(permissions.size());
+            
+            for (AccessPermission permission : permissions)
+            {
+                AccessPermission ace = new NodeContext.ACE(permission.getAccessStatus(),
+                                                           bindPlaceHolder(permission.getAuthority(), binding),
+                                                           permission.getPermission());
+                boundPermissions.add(ace);
+            }
+            
+            return boundPermissions;
+        }
 
         /**
          * Bind property value
@@ -1024,64 +1044,39 @@ public class ContentImporterComponentBase
             }
             else if (importedRef.startsWith("/"))
             {
-                // resolve absolute path
-                SearchParameters searchParameters = new SearchParameters();
-                searchParameters.addStore(sourceNodeRef.getStoreRef());
-                searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
-                searchParameters.setQuery("PATH:\"" + importedRef + "\"");
-                searchParameters.excludeDataInTheCurrentTransaction((binding == null) ? true : !binding.allowReferenceWithinTransaction());
-                ResultSet resultSet = null;
-                try
+                List<NodeRef> nodeRefs = searchService.selectNodes(sourceNodeRef, importedRef, null, namespaceService, false);
+                if (nodeRefs.size() > 0)
                 {
-                    resultSet = searchService.query(searchParameters);
-                    if (resultSet.length() > 0)
-                    {
-                        nodeRef = resultSet.getNodeRef(0);
-                    }
-                }
-                catch(UnsupportedOperationException e)
-                {
-                    List<NodeRef> nodeRefs = searchService.selectNodes(sourceNodeRef, importedRef, null, namespaceService, false);
-                    if (nodeRefs.size() > 0)
-                    {
-                        nodeRef = nodeRefs.get(0);
-                    }
-                }
-                finally
-                {
-                    if (resultSet != null)
-                    {
-                        resultSet.close();
-                    }
+                    nodeRef = nodeRefs.get(0);
                 }
             }
             else
             {
-               // determine if node reference
-               if (NodeRef.isNodeRef(importedRef))
-               {
-                  nodeRef = new NodeRef(importedRef);
-               }
-               else
-               {
-                   // resolve relative path
-                   try
-                   {
-                       List<NodeRef> nodeRefs = searchService.selectNodes(sourceNodeRef, importedRef, null, namespaceService, false);
-                       if (nodeRefs.size() > 0)
-                       {
-                           nodeRef = nodeRefs.get(0);
-                       }
-                   }
-                   catch(XPathException e)
-                   {
-                       nodeRef = new NodeRef(importedRef);
-                   }
-                   catch(AlfrescoRuntimeException e1)
-                   {
-                       // Note: Invalid reference format - try path search instead
-                   }
-               }
+            	// determine if node reference
+            	if (NodeRef.isNodeRef(importedRef))
+            	{
+            		nodeRef = new NodeRef(importedRef);
+            	}
+            	else
+            	{
+	                // resolve relative path
+	                try
+	                {
+	                    List<NodeRef> nodeRefs = searchService.selectNodes(sourceNodeRef, importedRef, null, namespaceService, false);
+	                    if (nodeRefs.size() > 0)
+	                    {
+	                        nodeRef = nodeRefs.get(0);
+	                    }
+	                }
+	                catch(XPathException e)
+	                {
+	                    nodeRef = new NodeRef(importedRef);
+	                }
+	                catch(AlfrescoRuntimeException e1)
+	                {
+	                    // Note: Invalid reference format - try path search instead
+	                }
+            	}
             }
             
             return nodeRef;
@@ -1286,7 +1281,8 @@ public class ContentImporterComponentBase
                 AccessStatus writePermission = permissionService.hasPermission(nodeRef, PermissionService.CHANGE_PERMISSIONS);
                 if (authenticationService.isCurrentUserTheSystemUser() || writePermission.equals(AccessStatus.ALLOWED))
                 {
-                    permissions = node.getAccessControlEntries();
+                    permissions = bindPermissions(node.getAccessControlEntries());
+                    
                     for (AccessPermission permission : permissions)
                     {
                         permissionService.setPermission(nodeRef, permission.getAuthority(), permission.getPermission(), permission.getAccessStatus().equals(AccessStatus.ALLOWED));
@@ -1470,7 +1466,9 @@ public class ContentImporterComponentBase
                             {
                                 permissionService.setInheritParentPermissions(existingNodeRef, false);
                             }
-                            permissions = node.getAccessControlEntries();
+                            
+                            permissions = bindPermissions(node.getAccessControlEntries());
+                            
                             for (AccessPermission permission : permissions)
                             {
                                 permissionService.setPermission(existingNodeRef, permission.getAuthority(), permission.getPermission(), permission.getAccessStatus().equals(AccessStatus.ALLOWED));

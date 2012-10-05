@@ -3,37 +3,64 @@
  
  <!--
 ETL Connector for Alfresco - Alfresco Server Extension
-http://knowledge.openwide.fr/Main/AlfrescoETLConnector
+http://knowledge.openwide.fr/bin/view/Main/AlfrescoETLConnector/
 Copyright (C) 2008-2012 Open Wide SA
 -->
 <beans>
 
+    <!-- =============== -->
+    <!-- Public services -->
+
+    <!-- Content Importer Service -->
+    <!-- (taken from Importer Service definition) -->
+
+    <bean id="talendalfresco.ContentImporterService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.service.cmr.view.ImporterService</value>
+        </property>
+        <property name="target">
+            <ref bean="talendalfresco.contentImporterComponent"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="ImporterService_transaction"/>
+                <idref bean="AuditMethodInterceptor"/>
+                <idref bean="exceptionTranslator"/>
+                <idref bean="ImporterService_security"/>
+            </list>
+        </property>
+    </bean>
+    
+    
+    <!-- ================= -->
+    <!-- Internal services -->
+
     <!-- Handles txn etc. so put all services in lower caps (only search and ownable were) -->
-    <bean id="talendalfresco.contentImporterService" class="fr.openwide.talendalfresco.alfresco.importer.ContentImporterComponent">
+    <bean id="talendalfresco.contentImporterComponent" class="fr.openwide.talendalfresco.alfresco.importer.ContentImporterComponent">
         <!-- For now, hard-wire the view parser -->
         <property name="namespaceService">
             <ref bean="NamespaceService" />
         </property>
         <property name="dictionaryService">
-            <ref bean="dictionaryService" />
+            <ref bean="DictionaryService" />
         </property>
         <property name="nodeService">
-            <ref bean="nodeService" />
+            <ref bean="NodeService" />
         </property>
         <property name="contentService">
-            <ref bean="contentService" />
+            <ref bean="ContentService" />
         </property>
         <property name="ruleService">
-            <ref bean="ruleService" />
+            <ref bean="RuleService" />
         </property>
         <property name="permissionService">
-            <ref bean="permissionService" />
+            <ref bean="PermissionService" />
         </property>
         <property name="authorityService">
-            <ref bean="authorityService" />
+            <ref bean="AuthorityService" />
         </property>
         <property name="authenticationService">
-            <ref bean="authenticationService" />
+            <ref bean="AuthenticationService" />
         </property>
         <property name="viewParser">
             <ref bean="talendalfresco.contentViewParser" />

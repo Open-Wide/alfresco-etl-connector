@@ -14,34 +14,34 @@ Copyright (C) 2008-2012 Open Wide SA
             <ref bean="NamespaceService" />
         </property>
         <property name="dictionaryService">
-            <ref bean="dictionaryService" />
+            <ref bean="DictionaryService" />
         </property>
         <property name="nodeService">
-            <ref bean="nodeService" />
+            <ref bean="NodeService" />
         </property>
         <property name="contentService">
-            <ref bean="contentService" />
+            <ref bean="ContentService" />
         </property>
         <property name="searchService">
-            <ref bean="searchService" />
+            <ref bean="SearchService" />
         </property>
         <property name="fileFolderService">
-            <ref bean="fileFolderService" />
+            <ref bean="FileFolderService" />
         </property>
         <property name="authorityService">
-           <ref bean="authorityService" />
+           <ref bean="AuthorityService" />
         </property>
         <property name="permissionService">
-           <ref bean="permissionService" />
+           <ref bean="PermissionService" />
         </property>
         <property name="actionService">
-            <ref bean="actionService" />
+            <ref bean="ActionService" />
         </property>
         <property name="authenticationService">
-         <ref bean="authenticationService" />
+         <ref bean="AuthenticationService" />
         </property>
         <property name="personService">
-            <ref bean="personService" />
+            <ref bean="PersonService" />
         </property>
         <property name="transactionService">
             <ref bean="transactionService" />
@@ -63,7 +63,7 @@ Copyright (C) 2008-2012 Open Wide SA
          <ref bean="talendalfresco.namePathService" />
       </property>
       <property name="contentImporterService">
-         <ref bean="talendalfresco.contentImporterService" />
+         <ref bean="talendalfresco.ContentImporterService" />
       </property>
    </bean>
 
