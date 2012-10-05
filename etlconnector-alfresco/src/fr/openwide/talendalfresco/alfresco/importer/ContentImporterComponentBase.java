@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -47,6 +47,7 @@ import org.alfresco.repo.importer.ImporterComponent;
 import org.alfresco.repo.importer.Parser;
 import org.alfresco.repo.importer.view.NodeContext;
 import org.alfresco.repo.policy.BehaviourFilter;
+import org.alfresco.repo.security.authentication.AuthenticationContext;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
@@ -66,7 +67,6 @@ import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
-import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.OwnableService;
 import org.alfresco.service.cmr.security.PermissionService;
@@ -117,7 +117,7 @@ public class ContentImporterComponentBase
     protected RuleService ruleService;
     protected PermissionService permissionService;
     protected AuthorityService authorityService;
-    protected AuthenticationService authenticationService;
+    protected AuthenticationContext authenticationContext;
     protected OwnableService ownableService;
 
     // binding markers    
@@ -208,11 +208,11 @@ public class ContentImporterComponentBase
     }
 
     /**
-     * @param authenticationService  authenticationService
+     * @param authenticationContext  authenticationContext
      */
-    public void setAuthenticationService(AuthenticationService authenticationService)
+    public void setAuthenticationContext(AuthenticationContext authenticationContext)
     {
-        this.authenticationService = authenticationService;
+        this.authenticationContext = authenticationContext;
     }
     
     /**
@@ -531,14 +531,17 @@ public class ContentImporterComponentBase
         public void importMetaData(Map<QName, String> properties)
         {
             // Determine if we're importing a complete repository
-            String path = properties.get(QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "exportOf"));
-            if (path != null && path.equals("/"))
+            String complexPath = properties.get(QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "exportOf"));
+            for (String path : complexPath.split(","))
             {
-                // Only allow complete repository import into root
-                NodeRef storeRootRef = nodeService.getRootNode(rootRef.getStoreRef());
-                if (!storeRootRef.equals(rootRef))
+                if (path != null && path.equals("/"))
                 {
-                    throw new ImporterException("A complete repository package cannot be imported here");
+                    // Only allow complete repository import into root
+                    NodeRef storeRootRef = nodeService.getRootNode(rootRef.getStoreRef());
+                    if (!storeRootRef.equals(rootRef))
+                    {
+                        throw new ImporterException("A complete repository package cannot be imported here");
+                    }
                 }
             }
         }
@@ -546,6 +549,7 @@ public class ContentImporterComponentBase
         /* (non-Javadoc)
          * @see org.alfresco.repo.importer.Importer#importNode(org.alfresco.repo.importer.ImportNode)
          */
+        @SuppressWarnings("unchecked")
         public NodeRef importNode(ImportNode context)
         {
             // import node
@@ -724,6 +728,7 @@ public class ContentImporterComponentBase
         /* (non-Javadoc)
          * @see org.alfresco.repo.importer.Importer#end()
          */
+        @SuppressWarnings("unchecked")
         public void end()
         {
             // Bind all node references to destination space
@@ -927,6 +932,7 @@ public class ContentImporterComponentBase
          * @param properties
          * @return
          */
+        @SuppressWarnings("unchecked")
         protected Map<QName, Serializable> bindProperties(ImportNode context)
         {
             Map<QName, Serializable> properties = context.getProperties();
@@ -949,7 +955,7 @@ public class ContentImporterComponentBase
                 if (value instanceof Collection)
                 {
                     List<Serializable> boundCollection = new ArrayList<Serializable>();
-                    for (String collectionValue : (Collection<String>)value)
+                    for (Serializable collectionValue : (Collection<Serializable>)value)
                     {
                         Serializable objValue = bindValue(context, property, valueDataType, collectionValue);
                         boundCollection.add(objValue);
@@ -958,7 +964,7 @@ public class ContentImporterComponentBase
                 }
                 else
                 {
-                    value = bindValue(context, property, valueDataType, (String)value);
+                    value = bindValue(context, property, valueDataType, value);
                 }
 
                 // choose to provide property on node creation or at end of import for lazy binding
@@ -1006,19 +1012,22 @@ public class ContentImporterComponentBase
          * @param value  string form of value
          * @return  the bound value
          */
-        protected Serializable bindValue(ImportNode context, QName property, DataTypeDefinition valueType, String value)
+        protected Serializable bindValue(ImportNode context, QName property, DataTypeDefinition valueType, Serializable value)
         {
             Serializable objValue = null;
             if (value != null && valueType != null)
             {
-                String strValue = bindPlaceHolder(value, binding);
+                if (value instanceof String)
+                {
+                    value = bindPlaceHolder(value.toString(), binding);
+                }
                 if ((valueType.getName().equals(DataTypeDefinition.NODE_REF) || valueType.getName().equals(DataTypeDefinition.CATEGORY)))
                 {
-                    objValue = strValue;
+                    objValue = value;
                 }
                 else
                 {
-                    objValue = (Serializable)DefaultTypeConverter.INSTANCE.convert(valueType, strValue);
+                    objValue = (Serializable) DefaultTypeConverter.INSTANCE.convert(valueType, value);
                 }
                 
             }
@@ -1271,7 +1280,7 @@ public class ContentImporterComponentBase
                 NodeRef nodeRef = assocRef.getChildRef();
 
                 // Note: non-admin authorities take ownership of new nodes
-                if (!(authorityService.hasAdminAuthority() || authenticationService.isCurrentUserTheSystemUser()))
+                if (!(authenticationContext.isCurrentUserTheSystemUser() || authorityService.hasAdminAuthority()))
                 {
                     ownableService.takeOwnership(nodeRef);
                 }
@@ -1279,7 +1288,7 @@ public class ContentImporterComponentBase
                 // apply permissions
                 List<AccessPermission> permissions = null;
                 AccessStatus writePermission = permissionService.hasPermission(nodeRef, PermissionService.CHANGE_PERMISSIONS);
-                if (authenticationService.isCurrentUserTheSystemUser() || writePermission.equals(AccessStatus.ALLOWED))
+                if (authenticationContext.isCurrentUserTheSystemUser() || writePermission.equals(AccessStatus.ALLOWED))
                 {
                     permissions = bindPermissions(node.getAccessControlEntries());
                     
@@ -1459,7 +1468,7 @@ public class ContentImporterComponentBase
                         // Apply permissions
                         List<AccessPermission> permissions = null;
                         AccessStatus writePermission = permissionService.hasPermission(existingNodeRef, PermissionService.CHANGE_PERMISSIONS);
-                        if (authenticationService.isCurrentUserTheSystemUser() || writePermission.equals(AccessStatus.ALLOWED))
+                        if (authenticationContext.isCurrentUserTheSystemUser() || writePermission.equals(AccessStatus.ALLOWED))
                         {
                             boolean inheritPermissions = node.getInheritPermissions();
                             if (!inheritPermissions)
