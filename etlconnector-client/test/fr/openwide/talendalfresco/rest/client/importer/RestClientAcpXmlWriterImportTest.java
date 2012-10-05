@@ -132,8 +132,7 @@ public class RestClientAcpXmlWriterImportTest extends TestCase {
       
       ArrayList<String[]> resultLogs = cmd.getResultLogs();
       assertTrue(resultLogs != null);
-      assertTrue(resultLogs.size() == 1);
-      //assertTrue(cmd.getErrorLogs().isEmpty());
+      //assertTrue(cmd.getErrorLogs().isEmpty()); // only if not yet imported (update does not work because no uuid)
       System.out.println("Result :");
       for (String[] resultLog : cmd.getResultLogs()) {
          System.out.println("   " + Arrays.asList(resultLog));
