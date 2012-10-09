@@ -96,4 +96,13 @@ public class RestCommandProcessor implements ExtCommandProcessor {
       this.restCommand.executeRest(serviceRegistry, req, res);
    }
 
+
+   /**
+    * Asks the command instance if it requires servlet-wide transactions
+    * @return
+    */
+	public boolean isTransactional() {
+		return this.restCommand != null && this.restCommand.isTransactional();
+	}
+
 }

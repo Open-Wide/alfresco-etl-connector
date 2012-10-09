@@ -47,6 +47,7 @@ import fr.openwide.talendalfresco.rest.server.processor.RestCommandResult;
 /**
  * Imports ACP XML.
  * Handles encoding of the request content.
+ * Requires disabled servlet request-wide transactions.
  * Hardwires encoding to RestServerHelper.DEFAULT_REST_ENCODING
  * (i.e. ISO-8859-1, which is required because tomcat uses it
  * by default, and changing it there would impact the whole webapp)
@@ -75,7 +76,11 @@ public class ImportCommand extends RestCommandBase {
    public ImportCommand() {
       super("import");
    }
-   
+
+	public boolean isTransactional() {
+		return false;
+	}
+	
 
    /**
     * 

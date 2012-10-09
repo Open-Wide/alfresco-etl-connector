@@ -23,7 +23,7 @@ Copyright (C) 2008-2012 Open Wide SA
         </property>
         <property name="interceptorNames">
             <list>
-                <idref bean="ImporterService_transaction"/>
+                <!-- idref bean="ImporterService_transaction"/ --><!-- Txn etc. handled explicitly -->
                 <idref bean="AuditMethodInterceptor"/>
                 <idref bean="exceptionTranslator"/>
                 <idref bean="ImporterService_security"/>
@@ -35,7 +35,7 @@ Copyright (C) 2008-2012 Open Wide SA
     <!-- ================= -->
     <!-- Internal services -->
 
-    <!-- Handles txn etc. so put all services in lower caps (only search and ownable were) -->
+    <!-- Txn etc. handled explicitly so put all services in lower caps (only search and ownable were) -->
     <bean id="talendalfresco.contentImporterComponent" class="fr.openwide.talendalfresco.alfresco.importer.ContentImporterComponent">
         <!-- For now, hard-wire the view parser -->
         <property name="namespaceService">
@@ -69,12 +69,12 @@ Copyright (C) 2008-2012 Open Wide SA
             <ref bean="policyBehaviourFilter" />
         </property>
         <property name="searchService">
-            <ref bean="searchService" />
+            <ref bean="SearchService" />
         </property>
         <property name="ownableService">
-           <ref bean="ownableService" />
+           <ref bean="OwnableService" />
         </property>
-        <!-- [talendalfresco] for transactions -->
+        <!-- [talendalfresco] for per node import transactions -->
         <property name="transactionService">
             <ref bean="transactionService" />
         </property>
@@ -91,10 +91,10 @@ Copyright (C) 2008-2012 Open Wide SA
     <!-- Handles txn etc. so put all services in lower caps (only search and ownable were) -->
     <bean id="talendalfresco.namePathService" class="fr.openwide.talendalfresco.alfresco.NamePathServiceImpl">
         <property name="nodeService">
-            <ref bean="nodeService" />
+            <ref bean="NodeService" />
         </property>
         <property name="searchService">
-            <ref bean="searchService" />
+            <ref bean="SearchService" />
         </property>
         <property name="alwaysUseDb">
             <value>true</value>
@@ -103,13 +103,16 @@ Copyright (C) 2008-2012 Open Wide SA
 
     <bean id="talendalfresco.contentViewParser" class="fr.openwide.talendalfresco.alfresco.importer.ContentViewParser">
         <property name="namespaceService">
-            <ref bean="namespaceService" />
+            <ref bean="NamespaceService" />
         </property>
         <property name="dictionaryService">
-            <ref bean="dictionaryService" />
+            <ref bean="DictionaryService" />
         </property>
         <property name="nodeService">
-            <ref bean="nodeService" />
+            <ref bean="NodeService" /><!-- only used for getType() -->
+        </property>
+        <property name="transactionService">
+            <ref bean="transactionService" />
         </property>
     </bean>
       

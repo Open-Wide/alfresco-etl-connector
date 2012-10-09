@@ -22,10 +22,17 @@ package fr.openwide.talendalfresco.alfresco.importer;
 
 import java.io.IOException;
 
+import javax.transaction.UserTransaction;
+
+import org.alfresco.repo.importer.view.NodeContext;
 import org.alfresco.repo.importer.view.ParentContext;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+
+import fr.openwide.talendalfresco.alfresco.importer.ContentImporterComponent.ContentNodeImporter;
 
 /**
  * Parses content (cm:object) ACP XML.
@@ -35,8 +42,10 @@ import org.xmlpull.v1.XmlPullParserException;
  * @author Marc Dutoo - Open Wide SA
  */
 public class ContentViewParser extends ViewParserBase {
+	
+	protected TransactionService transactionService;
 
-   public ContentViewParser() {
+	public ContentViewParser() {
       super();
    }
 
@@ -52,5 +61,54 @@ public class ContentViewParser extends ViewParserBase {
          contentImporterResultHandler.referenceError(parentContext.getParentRef(), parentContext.getAssocType(), null, t);
       }
    }
+
+	@Override
+	protected void processEndType(ParserContext parserContext, NodeContext node) {
+      importNode(parserContext, node); // copied from base
+      
+      // transactionally apply behaviour & rules :
+      NodeRef nodeRef = node.getNodeRef();
+      if (nodeRef == null) {
+         // import of node already failed, so can't apply its behaviour & rules
+         return;
+      }
+      UserTransaction userTransaction = null;
+      try {
+          // import it in a transaction
+          long start = System.nanoTime();
+            // get transaction : not getNonPropagatingUserTransaction which creates zombie nodes !!
+          userTransaction = transactionService.getUserTransaction();
+          userTransaction.begin();
+
+          node.getImporter().childrenImported(nodeRef); // behaviour & rules ; copied from base
+          
+          userTransaction.commit();
+          long end = System.nanoTime();
+          
+          // success not reported for behaviour & rules, only errors 
+          //((ContentNodeImporter) node.getImporter()).getContentImporterResultHandler().nodeSuccess(node, nodeRef, "behaviour & rules in " + (end - start) + "ns");
+          
+      } catch (Throwable t) {
+         // node import has failed
+         // let's rollback, log errors and skip over to the next node
+          try {
+              if (userTransaction != null) {
+                  userTransaction.rollback();
+              }
+          } catch (Exception ex) {
+             logger.debug("Unknown exception while rollbacking", ex);
+          }
+          
+          // error handling
+          ((ContentNodeImporter) node.getImporter()).getContentImporterResultHandler().nodeError(node,
+         		 new Exception("behaviour & rules : " + t.getMessage(), t));
+          
+          // NB. good error handling besides here : in ViewParser.importNode(), non created node is not registered as importId OK !
+      }
+	}
+
+   public void setTransactionService(TransactionService transactionService) {
+		this.transactionService = transactionService;
+	}
 
 }

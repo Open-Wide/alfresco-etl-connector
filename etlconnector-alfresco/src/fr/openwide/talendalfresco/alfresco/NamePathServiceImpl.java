@@ -32,6 +32,8 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
 
 
@@ -42,6 +44,8 @@ import org.springframework.util.StringUtils;
  *
  */
 public class NamePathServiceImpl implements NamePathService {
+	
+   protected static final Log logger = LogFactory.getLog(NamePathServiceImpl.class);
    
    protected NodeService nodeService;
    protected SearchService searchService;
@@ -132,8 +136,13 @@ public class NamePathServiceImpl implements NamePathService {
    public NodeRef getChildByPathName(String pathName, NodeRef currentNodeRef,
          QName targetLocationChildAssociationTypeQName) {
    	if (alwaysUseDb) {
-         return nodeService.getChildByName(currentNodeRef,
+         NodeRef foundNodeRef = nodeService.getChildByName(currentNodeRef,
                targetLocationChildAssociationTypeQName, pathName);
+         if (foundNodeRef != null && !nodeService.exists(foundNodeRef)) {
+          	// commit ends well but node not created because it did some underlaying non propagated transactions of its own
+          	logger.error("NamePathServiceImpl : zombie noderef " + foundNodeRef + " created (container " + pathName + ")");
+         }
+         return foundNodeRef;
    	}
       switch (pathName.length()) {
       case 0 :

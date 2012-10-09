@@ -90,7 +90,7 @@ import org.xml.sax.ContentHandler;
 
 
 /**
- * [talendalfresco] "almost" copy of ImportComponent v3.1 to allow extending it.
+ * [talendalfresco] "almost" copy of ImportComponent v3.2 to allow extending it.
  * Changes : changed every private to protected
  * 
  * Default implementation of the Importer Service

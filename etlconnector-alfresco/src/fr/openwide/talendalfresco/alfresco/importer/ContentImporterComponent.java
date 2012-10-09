@@ -109,7 +109,7 @@ public class ContentImporterComponent extends ContentImporterComponentBase {
           
           // Create a valid path and search
           path = bindPlaceHolder(path, binding);
-          if (path.indexOf(":") == -1) {
+          if (path.indexOf(":") == -1) { // TODO always
              // [talendalfresco] not an xpath ; assuming namepath syntax
              nodeRef = getOrCreateTargetContainer(path, (ContentImporterBinding) binding);
              if (nodeRef == null) {
@@ -171,12 +171,17 @@ public class ContentImporterComponent extends ContentImporterComponentBase {
             UserTransaction userTransaction = null;
             try {
                long start = System.nanoTime();
-               userTransaction = transactionService.getNonPropagatingUserTransaction(); // and not getUserTransaction !!
+               // get transaction : not getNonPropagatingUserTransaction which creates zombie nodes !!
+               userTransaction = transactionService.getUserTransaction();
                userTransaction.begin();
                
                foundOrCreatedNodeRef = this.createChildFolder(currentNodeRef, pathName, contentImporterBinding);
 
                userTransaction.commit();
+               if (!nodeService.exists(foundOrCreatedNodeRef)) {
+                	// commit ends well but node not created because it did some underlaying non propagated transactions of its own
+                	logger.error("ContentImporterComponent : zombie noderef " + foundOrCreatedNodeRef + " created (container " + pathName + ")");
+                }
                long end = System.nanoTime();
                // success handling
                // TODO log mode
@@ -275,7 +280,11 @@ public class ContentImporterComponent extends ContentImporterComponentBase {
       /** to ease access to our result handler */
       protected ContentImporterResultHandler contentImporterResultHandler;
 
-      protected ContentNodeImporter(NodeRef rootRef, QName rootAssocType,
+      public ContentImporterResultHandler getContentImporterResultHandler() {
+			return contentImporterResultHandler;
+		}
+
+		protected ContentNodeImporter(NodeRef rootRef, QName rootAssocType,
             ImporterBinding binding, ImportPackageHandler streamHandler,
             ImporterProgress progress) {
          super(rootRef, rootAssocType, binding, streamHandler, progress);
@@ -301,12 +310,17 @@ public class ContentImporterComponent extends ContentImporterComponentBase {
          try {
              // import it in a transaction
              long start = System.nanoTime();
-             userTransaction = transactionService.getNonPropagatingUserTransaction(); // and not getUserTransaction !!
+               // get transaction : not getNonPropagatingUserTransaction which creates zombie nodes !!
+             userTransaction = transactionService.getUserTransaction();
              userTransaction.begin();
              
              importedNodeRef = super.importNode(context);
              
              userTransaction.commit();
+             if (!nodeService.exists(importedNodeRef)) {
+                	// commit ends well but node not created because it did some underlaying non propagated transactions of its own
+             	logger.error("ContentImporterComponent : zombie noderef " + importedNodeRef + " created (" + context.getProperties() + ")");
+             }
              long end = System.nanoTime();
              
              // finally success handling
@@ -453,6 +467,7 @@ public class ContentImporterComponent extends ContentImporterComponentBase {
        * (non-Javadoc)
        * @see org.alfresco.repo.importer.Importer#end()
        */
+      @SuppressWarnings("unchecked")
       public void end()
       {
           // Bind all node references to destination space
@@ -462,7 +477,8 @@ public class ContentImporterComponent extends ContentImporterComponentBase {
              UserTransaction userTransaction = null;
              try {
                 long start = System.nanoTime();
-                userTransaction = transactionService.getNonPropagatingUserTransaction(); // and not getUserTransaction !!
+                // get transaction : not getNonPropagatingUserTransaction which creates zombie nodes !!
+                userTransaction = transactionService.getUserTransaction();
                 userTransaction.begin();
                 
 

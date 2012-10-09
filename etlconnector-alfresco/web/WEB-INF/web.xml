@@ -321,7 +321,9 @@
 
    <servlet>
       <servlet-name>commandServlet</servlet-name>
-      <servlet-class>org.alfresco.web.app.servlet.CommandServlet</servlet-class>
+      <!-- servlet-class>org.alfresco.web.app.servlet.CommandServlet</servlet-class -->
+      <!-- [talendalfresco] to manage own tx -->
+      <servlet-class>fr.openwide.talendalfresco.rest.server.ContentImportCommandServlet</servlet-class>
    </servlet>
 
    <servlet>

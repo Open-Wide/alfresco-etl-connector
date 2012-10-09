@@ -38,9 +38,10 @@ Client side (ETL tool) : get a *compatible* ETL tool release
 
 Server-side (Alfresco repository) : get the release *compatible* with your
 alfresco server at https://github.com/OpenWide-SI/alfresco-etl-connector/downloads .
-   * etlconnector-alfresco2.1 : *validated with 2.1 Entreprise for
-Tomcat*, should work with all 2.x Alfresco releases, reported to work on Labs 2.9b,
-may work on 3.1 (some issues solved, see Release notes), migration required above
+   * etlconnector-alfresco2.1 : *validated with 2.1 Entreprise for Tomcat*, should
+work with all 2.x Alfresco releases, reported to work on Labs 2.9b
+   * etlconnector-alfresco3.1 : *tested with 3.1 Entreprise for Tomcat*
+   * etlconnector-alfresco3.2 : *tested with 3.2 Community for Tomcat*
    * Alternatively, it may be provided in compatible ETL release bundles.
 
 Server-side installation
@@ -110,7 +111,7 @@ second has even been experienced.
 For developers
 --------------
 Alfresco Server Extension architecture
-   * builds on the existing Alfresco Content Package (ACP) import
+   * builds on the existing Alfresco Content Package (ACP) import code
    * enriches it with : import of each node in its own transaction,better
 name path addressing, full error logs, custom import strategies allowing
 creation vs update import modes
@@ -123,13 +124,13 @@ Building the Alfresco Server Extension
    * run Ant on the given build.xml
    * the ETL Connector Server release is in build/export/ , ready to be
 added to an Alfresco installation
-   * to support a newer version of Alfresco : update ContentImporterComponentBase
-and ViewParserBase respectively with the newer ImporterComponent and ViewParser
-source code and reapply changes on them (convert all, resp. some, "private" to
-"protected") ; also update contentImporterComponent & contentViewParser Spring
-definitions in talendalfresco-services-context.xml according to their newer
-versions ; update other alfresco configuration (web.xml, web-client-config-custom.xml
-and in samples).
+   * to support a newer version of Alfresco : update source overrides to the latest
+alfresco source code (ImporterComponent -> ContentImporterComponentBase, ViewParser
+-> ViewParserBase, CommandServlet > ContentImporterCommandServlet) and reapply
+changes on them (see javadoc) ; also update their Spring bean definitions
+(contentImporterComponent & contentViewParser) in talendalfresco-services-context.xml
+according to their newer versions ; update other alfresco configuration (web.xml,
+web-client-config-custom.xml and in samples).
 
 Building the ETL client library
    * provide the etlconnector-client Eclipse project with the java 1.5 dependencies
@@ -148,7 +149,24 @@ library) and JET Java templates in source at http://talendforge.org/trac/tos/bro
 http://www.talendforge.org/wiki/doku.php?id=dev:run_from_svn
 
 
-Release Notes - 1.1
+Release Notes - 1.3
+-------------------
+server
+   * migrated to and tested with Alfresco 3.2 Community
+   * disabled command servlet request-wide transactions for ImportCommand, allowing
+to use propagating transactions and fully transactionalized repository services. Done
+by also overriding CommandServlet code and replacing it in web.xml (though it could
+exist along the original one but would require changing client ETL code)
+   * reapplying rules & behaviours is now done in its own transaction. However a
+separate result line is returned only in error case.
+   
+client
+   * now custom CommandServlet URL path can be specified (typically when deploying
+etlconnector-alfresco3.1.3+'s  overriden ContentImporterCommandServlet along the
+original one).
+
+
+Release Notes - 1.2
 -------------------
 server
    * migrated to and tested with Alfresco 3.1 Entreprise

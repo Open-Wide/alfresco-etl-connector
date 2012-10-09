@@ -26,7 +26,6 @@ package fr.openwide.talendalfresco.alfresco.importer;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -63,9 +62,12 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 
 /**
- * [talendalfresco] "almost" copy of ViewParser v3.1 to allow extending it.
+ * [talendalfresco] "almost" copy of ViewParser v3.2 to allow extending it.
  * Changes : changed private to protected to allow override for :
  * startReference(), to allow catching non existing asso refs errors
+ * processEndType(), to allow for a separate transactions for rules & behaviours
+ * importNode(), to refer to it in overriden sprocessEndType()
+ * logger, nodeService
  * ParserContext
  * 
  * Importer for parsing and importing nodes given the Repository View schema.
@@ -75,7 +77,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 public class ViewParserBase implements Parser
 {
     // Logger
-    private static final Log logger = LogFactory.getLog(ViewParser.class);
+    protected static final Log logger = LogFactory.getLog(ViewParser.class);
     
     // View schema elements and attributes
     private static final String VIEW_CHILD_NAME_ATTR = "childName";    
@@ -106,7 +108,7 @@ public class ViewParserBase implements Parser
     
     // Supporting services
     private NamespaceService namespaceService;
-    private NodeService nodeService;
+    protected NodeService nodeService;
     private DictionaryService dictionaryService;
 
     // Parser Context maintained during each parse
@@ -884,7 +886,7 @@ public class ViewParserBase implements Parser
      * 
      * @param node
      */
-    private void processEndType(ParserContext parserContext, NodeContext node)
+    protected void processEndType(ParserContext parserContext, NodeContext node)
     {
         importNode(parserContext, node);
         NodeRef nodeRef = node.getNodeRef();
@@ -917,7 +919,7 @@ public class ViewParserBase implements Parser
      * @param parserContext  parser context
      * @param node  node context
      */
-    private void importNode(ParserContext parserContext, NodeContext node)
+    protected void importNode(ParserContext parserContext, NodeContext node)
     {
         if (node.getNodeRef() == null)
         {

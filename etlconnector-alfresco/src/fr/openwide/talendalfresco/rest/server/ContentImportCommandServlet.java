@@ -49,7 +49,12 @@ import org.alfresco.web.config.CommandServletConfigElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import fr.openwide.talendalfresco.rest.server.processor.RestCommandProcessor;
+
 /**
+ * [talendalfresco] "almost" copy of CommandServlet v3.2
+ * Changes : disabled servlet-wide transactions for ImportCommand
+ * 
  * Servlet responsible for executing commands upon node(s).
  * <p>
  * The URL to the servlet should be generated thus:
@@ -148,8 +153,12 @@ public class ContentImportCommandServlet extends BaseServlet
          UserTransaction txn = null;
          try
          {
+         	if (!(processor instanceof RestCommandProcessor)
+         			|| ((RestCommandProcessor) processor).isTransactional()) {
+         			// [talendalfresco] disable tx for ImportCommand
             txn = serviceRegistry.getTransactionService().getUserTransaction();
             txn.begin();
+         	}
             
             // inform the processor to execute the specified command
             if (processor instanceof ExtCommandProcessor)
@@ -160,13 +169,21 @@ public class ContentImportCommandServlet extends BaseServlet
             {
                processor.process(serviceRegistry, req, command);
             }
-            
+
+         	if (!(processor instanceof RestCommandProcessor)
+         			|| ((RestCommandProcessor) processor).isTransactional()) {
+         			// [talendalfresco] disable tx for ImportCommand
             // commit the transaction
             txn.commit();
+         	}
          }
          catch (Throwable txnErr)
          {
+         	if (!(processor instanceof RestCommandProcessor)
+         			|| ((RestCommandProcessor) processor).isTransactional()) {
+         			// [talendalfresco] disable tx for ImportCommand
             try { if (txn != null) {txn.rollback();} } catch (Exception tex) {}
+         	}
             throw txnErr;
          }
          

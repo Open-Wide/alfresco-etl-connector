@@ -48,4 +48,6 @@ public interface RestCommand extends Command {
    void executeRest(ServiceRegistry serviceRegistry,
          HttpServletRequest req, HttpServletResponse res);
 
+	public boolean isTransactional();
+	
 }

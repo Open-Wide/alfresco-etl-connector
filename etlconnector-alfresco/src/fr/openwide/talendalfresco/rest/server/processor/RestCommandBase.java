@@ -60,6 +60,7 @@ import fr.openwide.talendalfresco.rest.server.RestServerHelper;
  * (i.e. ISO-8859-1, which is required because tomcat uses it
  * by default, and changing it there would impact the whole webapp).
  * NB. otherwise could take it from request.
+ * By default, requires servlet request-wide transactions.
  *
  * @author Marc Dutoo - Open Wide SA
  *
@@ -272,5 +273,9 @@ public abstract class RestCommandBase implements RestCommand {
    public void setTransactionService(TransactionService transactionService) {
       RestCommandBase.transactionService = transactionService;
    }
+
+	public boolean isTransactional() {
+		return true;
+	}
     
 }
