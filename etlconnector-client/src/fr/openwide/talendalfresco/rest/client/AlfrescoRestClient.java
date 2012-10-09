@@ -21,7 +21,6 @@
 
 package fr.openwide.talendalfresco.rest.client;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -82,6 +81,20 @@ public class AlfrescoRestClient {
    public AlfrescoRestClient(String serverUrl, String restEncoding) {
       this(serverUrl);
       this.restEncoding = restEncoding;
+   }
+   
+   /**
+    * Allows to use a CommandServlet deployed at a custom url path
+    * (typically when deploying etlconnector-alfresco3.1.3+'s
+    * overriden ContentImporterCommandServlet along the original one).
+    * @param serverUrl
+    * @param restEncoding
+    * @param commandServletUrl
+    */
+   public AlfrescoRestClient(String serverUrl, String restEncoding, String commandServletUrl) {
+      this(serverUrl);
+      this.restEncoding = restEncoding;
+      this.commandServletUrl = commandServletUrl;
    }
    
    public AlfrescoRestClient(String serverUrl) {
@@ -152,7 +165,7 @@ public class AlfrescoRestClient {
             clientCommand.handleResponse(xmlReader);
 
             if (!RestConstants.CODE_OK.equals(clientCommand.getResultCode())) {
-               String msg = "Business error in command " + clientCommand.toString();
+               //String msg = "Business error in command " + clientCommand.toString();
                //logger.error(msg, e);
                throw new RestClientException(clientCommand.getResultMessage(),
                      new RestClientException(clientCommand.getResultError()));

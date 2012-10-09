@@ -238,7 +238,8 @@ public abstract class ClientCommandBase implements ClientCommand {
       }
    }
 
-   public String toString() {
+   @SuppressWarnings("unchecked")
+	public String toString() {
       StringBuffer sbuf = new StringBuffer();
       sbuf.append("Command ");
       sbuf.append(name);

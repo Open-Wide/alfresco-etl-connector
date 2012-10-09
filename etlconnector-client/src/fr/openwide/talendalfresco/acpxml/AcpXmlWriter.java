@@ -172,36 +172,7 @@ public class AcpXmlWriter {
    }
    public void writeEndPermissions() throws AcpXmlException {
       try {
-         xmlWriter.writeEndElement(); // end acl
-      } catch (XMLStreamException e) {
-         throw new AcpXmlException("XML writing error when writing content", e);
-      }
-   }
-   /**
-    * 
-    * @param alfrescoAspects list of mapped NAME
-    * @throws AcpXmlException
-    */
-   public void writeMappedAspects(List<Map<String,String>> alfrescoAspects) throws AcpXmlException{
-      // aspects
-      if (alfrescoAspects != null) {
-         for (Map<String,String> alfrescoAspect : alfrescoAspects) {
-            String alfrescoAspectName = alfrescoAspect.get("NAME");
-            this.writeAspect(alfrescoAspectName); // "app:uifacets"
-         }
-      }
-   }
-   public void writeAspects(List<String> alfrescoAspectNames) throws AcpXmlException{
-      // aspects
-      if (alfrescoAspectNames != null) {
-         for (String alfrescoAspectName : alfrescoAspectNames) {
-            this.writeAspect(alfrescoAspectName); // "app:uifacets"
-         }
-      }
-   }
-   public void writeAspect(String alfrescoAspectName) throws AcpXmlException{
-      try {
-         xmlWriter.writeEmptyElement(alfrescoAspectName); // "app:uifacets"
+         xmlWriter.writeEndElement(); // end view:acl
       } catch (XMLStreamException e) {
          throw new AcpXmlException("XML writing error when writing content", e);
       }
@@ -209,6 +180,66 @@ public class AcpXmlWriter {
    
    /**
     * 
+    * @param alfrescoAspects list of mapped NAME
+    * @throws AcpXmlException
+    */
+   public void writeMappedAspects(List<Map<String,String>> alfrescoAspects) throws AcpXmlException{
+   	writeStartAspects();
+      // aspects
+      if (alfrescoAspects != null) {
+         for (Map<String,String> alfrescoAspect : alfrescoAspects) {
+            String alfrescoAspectName = alfrescoAspect.get("NAME");
+            this.writeAspect(alfrescoAspectName); // "app:uifacets"
+         }
+      }
+      writeEndAspects();
+   }
+   public void writeAspects(List<String> alfrescoAspectNames) throws AcpXmlException{
+   	writeStartAspects();
+      // aspects
+      if (alfrescoAspectNames != null) {
+         for (String alfrescoAspectName : alfrescoAspectNames) {
+            this.writeAspect(alfrescoAspectName); // "app:uifacets"
+         }
+      }
+      writeEndAspects();
+   }
+   public void writeStartAspects() throws AcpXmlException{
+      try {
+         xmlWriter.writeStartElement("view:aspects");
+      } catch (XMLStreamException e) {
+         throw new AcpXmlException("XML writing error when writing content", e);
+      }
+   }
+   /**
+    * Must be between writeStartAspects & writeEndAspects in a document
+    * @param alfrescoAspectName
+    * @throws AcpXmlException
+    */
+   public void writeAspect(String alfrescoAspectName) throws AcpXmlException{
+      try {
+         xmlWriter.writeEmptyElement(alfrescoAspectName); // "app:uifacets"
+      } catch (XMLStreamException e) {
+         throw new AcpXmlException("XML writing error when writing content : aspect " + alfrescoAspectName, e);
+      }
+   }
+   public void writeEndAspects() throws AcpXmlException{
+      try {
+         xmlWriter.writeEndElement(); // end view:aspects
+      } catch (XMLStreamException e) {
+         throw new AcpXmlException("XML writing error when writing content", e);
+      }
+   }
+
+   public void writeStartProperties() throws AcpXmlException{
+      try {
+         xmlWriter.writeStartElement("view:properties");
+      } catch (XMLStreamException e) {
+         throw new AcpXmlException("XML writing error when writing content", e);
+      }
+   }
+   /**
+    * Must be between writeStartProperties() & writeEndProperties() in a document
     * @param propertyMappings prefixed alfresco property ; mapped
     * NAME, TITLE (not used), TYPE (used for conversion ?? TODO),
     * MANDATORY (could be used for check ?), DEFAULT (not used ?),
@@ -229,13 +260,15 @@ public class AcpXmlWriter {
       writeProperty(propertyName, propertyType, value);
    }
    /**
+    * Must be between writeStartProperties() & writeEndProperties() in a document
     * To be used for direct access, ex. write name of containers.
     * @param propertyName
     * @param propertyType
     * @param value
     * @throws AcpXmlException
     */
-   public void writeProperty(String propertyName, String propertyType, Object value) throws AcpXmlException {
+   @SuppressWarnings("unchecked")
+	public void writeProperty(String propertyName, String propertyType, Object value) throws AcpXmlException {
       try {
          if (value instanceof List) {
             // multivalued property ; or based on MULTIPLE TODO in model
@@ -282,8 +315,17 @@ public class AcpXmlWriter {
             
          } // else null : don't write it (allowed to ease mapping from etl)
          
+      } catch (AcpXmlException e) {
+      	throw e;
       } catch (XMLStreamException e) {
          throw new AcpXmlException("XML writing error when writing content : property " + propertyName, e);
+      }
+   }
+   public void writeEndProperties() throws AcpXmlException{
+      try {
+         xmlWriter.writeEndElement(); // end view:properties
+      } catch (XMLStreamException e) {
+         throw new AcpXmlException("XML writing error when writing content", e);
       }
    }
    
@@ -327,9 +369,16 @@ public class AcpXmlWriter {
          return String.valueOf(value); // "my_file_writer.pdf" ; NB. CDATA works, but rather using auto escaping
       }
    }
-   
+
+   public void writeStartAssociations() throws AcpXmlException{
+      try {
+         xmlWriter.writeStartElement("view:associations"); 
+      } catch (XMLStreamException e) {
+         throw new AcpXmlException("XML writing error when writing content", e);
+      }
+   }
    /**
-    * 
+    * Must be between writeStartAssociations() & writeEndAssociations() in a document
     * @param associationMappings prefixed alfresco (non primary child) associations ; list of mapped
     * NAME, CHILD (not used), TITLE (not used), TYPE (used for conversion ?? TODO),
     * MANDATORY (could be used for check ?), MANY (not used),
@@ -343,7 +392,14 @@ public class AcpXmlWriter {
       String associationName = associationMappings.get("NAME");
       writeAssociation(associationName, value);
    }
-   public void writeAssociation(String associationName, Object value) throws AcpXmlException {
+   /**
+    * Must be between writeAssociationsStart() & writeAssociationsEnd() in a document
+    * @param associationName
+    * @param value
+    * @throws AcpXmlException
+    */
+   @SuppressWarnings("unchecked")
+	public void writeAssociation(String associationName, Object value) throws AcpXmlException {
       try {
          if (value instanceof List) {
             // multivalued asso
@@ -388,6 +444,7 @@ public class AcpXmlWriter {
    }
 
    /**
+    * Must be between writeStartAssociations() & writeEndAssociations() in a document
     * containment association.
     * Stacks up path name. Requires the "cm:name" property to have already been set.
     * @param parentChildAssociationType
@@ -408,7 +465,15 @@ public class AcpXmlWriter {
     */
    public void writeEndPrimaryChildAssociation() throws AcpXmlException{
       try {
-         xmlWriter.writeEndElement();
+         xmlWriter.writeEndElement(); // end cm:contains
+      } catch (XMLStreamException e) {
+         throw new AcpXmlException("XML writing error when writing content", e);
+      }
+   }
+   
+   public void writeEndAssociations() throws AcpXmlException{
+      try {
+         xmlWriter.writeEndElement(); // end view:associations
       } catch (XMLStreamException e) {
          throw new AcpXmlException("XML writing error when writing content", e);
       }
@@ -416,7 +481,7 @@ public class AcpXmlWriter {
    
    public void writeEndContent() throws AcpXmlException{
       try {
-         xmlWriter.writeEndElement();
+         xmlWriter.writeEndElement(); // end cm:content
       } catch (XMLStreamException e) {
          throw new AcpXmlException("XML writing error when writing content", e);
       }

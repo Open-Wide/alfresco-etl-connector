@@ -162,8 +162,11 @@ separate result line is returned only in error case.
    
 client
    * now custom CommandServlet URL path can be specified (typically when deploying
-etlconnector-alfresco3.1.3+'s  overriden ContentImporterCommandServlet along the
+etlconnector-alfresco3.1.3+'s overriden ContentImporterCommandServlet along the
 original one).
+   * patched cm:folder / view:associations / cm:container hierarchy which was missing
+view:associations (but to no harm in most cases)
+   * improved test framework, added test of duplicate child name error case
 
 
 Release Notes - 1.2

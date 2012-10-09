@@ -52,7 +52,8 @@ public class LogoutCommand extends RestCommandBase {
    }
 
    
-   public void executeImpl() throws XMLStreamException {
+   @SuppressWarnings("unchecked")
+	public void executeImpl() throws XMLStreamException {
         // Invalidate Session for this user.
         if (Application.inPortalServer() == false) {
            // This causes the sessionDestroyed() event to be processed by ContextListener

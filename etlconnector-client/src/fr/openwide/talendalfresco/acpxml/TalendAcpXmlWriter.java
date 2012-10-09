@@ -75,7 +75,8 @@ public class TalendAcpXmlWriter {
 
    
    /**
-    * Moves to target location, then writes type, permissions, aspects.
+    * Moves to target location (from last writeEndDocument),
+    * then writes type, permissions, aspects.
     * Out of this method remains to be done for this document :
     * properties
     * associations
@@ -117,7 +118,7 @@ public class TalendAcpXmlWriter {
    
 
    /**
-    * 
+    * Moves to target location (from last writeEndDocument)
     * @param targetLocation
     * @param permissionValues full permission info requried
     * @throws AcpXmlException
@@ -164,13 +165,8 @@ public class TalendAcpXmlWriter {
    protected void writeStartContainer(String name) throws AcpXmlException {
       acpXmlWriter.writeStartContent(containerType, ContentImporterConfiguration.CHILD_NAME_CONTAINER);
       // no custom permissions
-      // no additional aspects
-      acpXmlWriter.writeProperty("cm:name", "d:text", name);
-      // no other properties
-      // starting containment child asso
-      acpXmlWriter.writeStartPrimaryChildAssociation(containerChildAssociationType);
+      writeContainerUntilChildren(name);
    }
-   
    protected void writeStartLastContainer(String name, String[][] permissionValues) throws AcpXmlException {
       acpXmlWriter.writeStartContent(containerType, ContentImporterConfiguration.CHILD_NAME_CONTAINER);
       if (configurePermission && !permissionOnDocumentAndNotContainer) {
@@ -182,10 +178,16 @@ public class TalendAcpXmlWriter {
          }
          writeEndPermissions();
       }
-      // no assitional aspects
+      writeContainerUntilChildren(name);
+   }
+   protected void writeContainerUntilChildren(String name) throws AcpXmlException {
+      // no additional aspects
+      acpXmlWriter.writeStartProperties();
       acpXmlWriter.writeProperty("cm:name", "d:text", name);
+      acpXmlWriter.writeEndProperties();
       // no other properties
       // starting containment child asso
+      acpXmlWriter.writeStartAssociations();
       acpXmlWriter.writeStartPrimaryChildAssociation(containerChildAssociationType);
    }
    
@@ -207,9 +209,12 @@ public class TalendAcpXmlWriter {
    public void writeDocumentAspects() throws AcpXmlException{
       acpXmlWriter.writeAspects(alfrescoAspects);
    }
-   
+
+   public void writeStartProperties() throws AcpXmlException {
+      acpXmlWriter.writeStartProperties();
+   }
    /**
-    * 
+    * Must be between writeStartProperties() & writeEndProperties() in a document
     * @param propertyMappings prefixed alfresco property ; mapped
     * NAME, TITLE (not used), TYPE (used for conversion ?? TODO),
     * MANDATORY (could be used for check ?), DEFAULT (not used ?),
@@ -222,13 +227,26 @@ public class TalendAcpXmlWriter {
          Object value) throws AcpXmlException {
       acpXmlWriter.writeMappedProperty(propertyMapping, value);
    }
+   /**
+    * Must be between writeStartProperties() & writeEndProperties() in a document
+    * @param propertyName
+    * @param propertyType
+    * @param value
+    * @throws AcpXmlException
+    */
    public void writeProperty(String propertyName, String propertyType,
          Object value) throws AcpXmlException {
       acpXmlWriter.writeProperty(propertyName, propertyType, value);
    }
-   
+   public void writeEndProperties() throws AcpXmlException {
+      acpXmlWriter.writeEndProperties();
+   }
+
+   public void writeStartAssociations() throws AcpXmlException {
+      acpXmlWriter.writeStartAssociations();
+   }
    /**
-    * 
+    * Must be between writeStartAssociations() & writeEndAssociations() in a document
     * @param associationMappings prefixed alfresco (non primary child) associations ; list of mapped
     * NAME, CHILD (not used), TITLE (not used), TYPE (used for conversion ?? TODO),
     * MANDATORY (could be used for check ?), MANY (not used),
@@ -241,17 +259,27 @@ public class TalendAcpXmlWriter {
          Object ref) throws AcpXmlException{
       acpXmlWriter.writeMappedAssociation(associationMappings, ref);
    }
+   /**
+    * Must be between writeStartAssociations() & writeEndAssociations() in a document
+    * @param associationName
+    * @param ref
+    * @throws AcpXmlException
+    */
    public void writeAssociation(String associationName,
          Object ref) throws AcpXmlException{
       acpXmlWriter.writeAssociation(associationName, ref);
+   }
+   public void writeEndAssociations() throws AcpXmlException {
+      acpXmlWriter.writeEndAssociations();
    }
 
    public void writeEndDocument() throws AcpXmlException {
       acpXmlWriter.writeEndContent();
    }
    public void writeEndContainer() throws AcpXmlException {
-      acpXmlWriter.writeEndPrimaryChildAssociation();
-      acpXmlWriter.writeEndContent();
+      acpXmlWriter.writeEndPrimaryChildAssociation(); // end cm:contains
+      acpXmlWriter.writeEndAssociations(); // end view:associations
+      acpXmlWriter.writeEndContent(); // end cm:content
    }
 
    public void setMappedContentNamespaces(List<Map<String, String>> mappedContentNamespaces) {

@@ -26,6 +26,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -47,7 +48,8 @@ import fr.openwide.talendalfresco.rest.client.RestClientException;
 public class RestClientTalendAcpXmlWriterImportTest extends TestCase {
 
 	// file path is relative to project
-	private static final Object CLASSPATH_FILE_PATH = "classpath:alfresco/bootstrap/webscripts/readme.html";
+	private static final String FILE_NAME = "readme.html";
+	private static final String CLASSPATH_FILE_PATH = "classpath:alfresco/bootstrap/webscripts/" + FILE_NAME;
 	private String serverFileSeparator = File.separator; // to change depending on the server
 	
 	private AlfrescoRestClient alfrescoRestClient;
@@ -130,12 +132,12 @@ public class RestClientTalendAcpXmlWriterImportTest extends TestCase {
 
 			writeTestDocument1("");
 			writeTestDocument1("test2");
-			writeTestDocument1("test2/test1");
-			writeTestDocument1("test2/test1/test3/test1");
-			writeTestDocumentError("test2/test1/test3/test2");
-			writeTestDocument1("test2/test1/test0/test1");
-			writeTestDocument1("test2/test2");
-
+			writeTestDocument1("test2/test21"); // subfolder
+			writeTestDocument1("test2/test21/test211/test2111"); // deep subfolder
+			writeTestDocumentError("test2/test21/test211/test2112"); // another deep subfolder, content path error
+			writeTestDocument1("test2/test21/test212/test2121"); // back up
+			writeTestDocument1("test2/test21/test212/test2121"); // duplicate child node error
+			writeTestDocument1("test2/test22"); // back up several layers
 			talendAcpXmlWriter.close();
 		} catch (AcpXmlException e) {
 			throw new RestClientException("Error creating XML result", e);
@@ -170,6 +172,11 @@ public class RestClientTalendAcpXmlWriterImportTest extends TestCase {
 	}
 
 	private void writeTestDocument1(String slashedPath) throws AcpXmlException {
+		writeTestDocument1(slashedPath, FILE_NAME, CLASSPATH_FILE_PATH);
+	}
+
+	private void writeTestDocument1(String slashedPath,
+			String fileName, String filePath) throws AcpXmlException {
 		String serverOsSlashedPath = patchSlashedPathForServer(slashedPath);
 
 		talendAcpXmlWriter
@@ -177,46 +184,31 @@ public class RestClientTalendAcpXmlWriterImportTest extends TestCase {
 						new String[][] { new String[] { "GROUP_EVERYONE",
 								"Consumer" } });
 
+		talendAcpXmlWriter.writeStartProperties();
 		talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() {
 			{
 				put("NAME", "cm:name");
 				put("TYPE", "d:text");
 			}
-		}, "my_file_writer.pdf");
+		}, fileName + "_" + slashedPath.substring(slashedPath.lastIndexOf("/") + 1));
 		talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() {
 			{
 				put("NAME", "cm:content");
 				put("TYPE", "d:content");
 			}
-		}, CLASSPATH_FILE_PATH);
+		}, filePath);
+		talendAcpXmlWriter.writeEndProperties();
+		
+		talendAcpXmlWriter.writeStartAssociations();
+		talendAcpXmlWriter.writeEndAssociations();
 
 		talendAcpXmlWriter.writeEndDocument();
 	}
 
 	private void writeTestDocumentError(String slashedPath)
 			throws AcpXmlException {
-		String serverOsSlashedPath = patchSlashedPathForServer(slashedPath);
-
-		talendAcpXmlWriter
-				.writeStartDocument(serverOsSlashedPath,
-						new String[][] { new String[] { "GROUP_EVERYONE",
-								"Consumer" } });
-
-		talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() {
-			{
-				put("NAME", "cm:name");
-				put("TYPE", "d:text");
-			}
-		}, "my_file_writer.pdf");
-		
-		talendAcpXmlWriter.writeMappedProperty(new HashMap<String, String>() {
-			{
-				put("NAME", "cm:content");
-				put("TYPE", "d:content");
-			}
-		}, "classpath:alfresco/bootstrap/Alfresco-Tutorial.pdfT"); // error : does not exist
-
-		talendAcpXmlWriter.writeEndDocument();
+		writeTestDocument1(slashedPath, FILE_NAME,
+				CLASSPATH_FILE_PATH + "T"); // error : does not exist
 	}
 
 	private String patchSlashedPathForServer(String slashedPath) {
