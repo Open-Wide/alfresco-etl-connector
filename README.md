@@ -87,7 +87,7 @@ ETL Connector
    
 Using ETL Connector with Talend
    * Talend documentation in the Talend 3.1 manual at http://www.talend.com/resources/documentation.php
-   * Tutorials by Nicolas Feray about using a CSV filing plan, error log hanlding, rights management at http://nicolas.feray.free.fr/blog/?cat=5
+   * Tutorials by Nicolas Feray about using a CSV filing plan, error log handling, rights management at http://nicolas.feray.free.fr/blog/?cat=5
    * Talend use case at http://www.talend.com/open-source-provider/casestudy/CaseStudy_Habitat76_FR.php
    * Presentation by Open Wide (French) at http://www.openwide.fr/index.php/Open-Wide/Lab/Contributions/Alfresco-Meetup-ETL-Connector-Talend
    * Tutorial courtesy of Landry Louam (French) about using an XML filing plan at http://landry-kouam.developpez.com/tutoriels/solutions-entreprise/ecm/integration-massive-document-dans-alfresco-suivant-plan-classement-avec-talend-open-studio
