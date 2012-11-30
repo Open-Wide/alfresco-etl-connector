@@ -42,6 +42,7 @@ alfresco server at https://github.com/OpenWide-SI/alfresco-etl-connector/downloa
 work with all 2.x Alfresco releases, reported to work on Labs 2.9b
    * etlconnector-alfresco3.1 : *tested with 3.1 Entreprise for Tomcat*
    * etlconnector-alfresco3.2 : *tested with 3.2 Community for Tomcat*
+   * etlconnector-alfresco4.1 : *tested with 4.1.1 Enterprise for Tomcat*
    * Alternatively, it may be provided in compatible ETL release bundles.
 
 Server-side installation
@@ -54,7 +55,7 @@ startup logs (alfresco.log) a line like this one :
    
 Test
    * You can test it by using the samples provided in the companion project
-etlconnector-samples , and a compatible ETL like Talend 3.1 on the client side.
+etlconnector-samples , and a compatible ETL like Talend 3.1 or greater on the client side.
 
 *For the Quitus sample, using Talend* :
    * put the etlconnector-samples*jar in WEB-INF/lib in your alfresco web
