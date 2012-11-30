@@ -23,9 +23,9 @@ package fr.openwide.talendalfresco.alfresco.util;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-import org.alfresco.i18n.I18NUtil;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.MimetypeService;
+import org.springframework.extensions.surf.util.I18NUtil;
 
 
 /**

@@ -5,6 +5,6 @@
 	<classpathentry kind="lib" path="web/WEB-INF/lib/etlconnector-client_1.1.jar"/>
 	<classpathentry kind="lib" path="web/WEB-INF/lib/wstx-lgpl-3.2.7.jar"/>
 	<classpathentry kind="lib" path="web/WEB-INF/lib/stax-api-1.0.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/SDK AlfrescoEmbedded 3.2 Community"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SDK AlfrescoEmbedded"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

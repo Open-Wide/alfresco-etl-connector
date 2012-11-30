@@ -1258,11 +1258,11 @@ public class ContentImporterComponentBase
                 List<QName> alreadyDisabledBehaviours = new ArrayList<QName>(); 
                 for (QName disabledBehaviour: disabledBehaviours)
                 {
-                    boolean alreadyDisabled = behaviourFilter.disableBehaviour(disabledBehaviour);
-                    if (alreadyDisabled)
-                    {
+                    /*boolean alreadyDisabled =*/ behaviourFilter.disableBehaviour(disabledBehaviour);
+                    /*if (alreadyDisabled)
+                    {*/
                         alreadyDisabledBehaviours.add(disabledBehaviour);
-                    }
+                    /*}*/
                 }
                 disabledBehaviours.removeAll(alreadyDisabledBehaviours);
                 

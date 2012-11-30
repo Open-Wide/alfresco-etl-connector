@@ -20,6 +20,11 @@
    </context-param>
 
    <context-param>
+      <param-name>javax.faces.PARTIAL_STATE_SAVING_METHOD</param-name>
+      <param-value>false</param-value>
+   </context-param>
+
+   <context-param>
       <param-name>javax.faces.CONFIG_FILES</param-name>
       <param-value>/WEB-INF/faces-config-app.xml,/WEB-INF/faces-config-beans.xml,/WEB-INF/faces-config-navigation.xml,/WEB-INF/faces-config-common.xml,/WEB-INF/faces-config-repo.xml,/WEB-INF/faces-config-wcm.xml,/WEB-INF/faces-config-custom.xml</param-value>
    </context-param>
@@ -65,16 +70,13 @@
         </description>
     </context-param>
 
+   <!-- Spring Application Context location -->
    <context-param>
       <param-name>contextConfigLocation</param-name>
       <param-value>/WEB-INF/web-application-context.xml</param-value>
       <description>Spring config file location</description>
    </context-param>
-   <context-param>
-      <param-name>contextClass</param-name>
-      <param-value>org.alfresco.config.JBossEnabledWebApplicationContext</param-value>
-      <description>Spring context class</description>
-   </context-param>
+   
    <context-param>
       <param-name>log4jExposeWebAppRoot</param-name>
       <param-value>false</param-value>
@@ -93,6 +95,12 @@
          <param-value>/app:company_home</param-value>
    </context-param>
 
+   <context-param>
+      <param-name>org.apache.myfaces.ERROR_HANDLING</param-name>
+      <param-value>false</param-value>
+   </context-param>
+   
+   <context-param><param-name>productionMode</param-name><param-value>true</param-value><description>Vaadin production mode</description></context-param>
 
    <filter>
       <filter-name>Authentication Filter</filter-name>
@@ -102,16 +110,11 @@
          <param-name>beanName</param-name>
          <param-value>AuthenticationFilter</param-value>
       </init-param>
-
-      <!-- For Novell IChain support use the following filter -->
-      <!--
-      <filter-class>org.alfresco.web.app.servlet.NovellIChainsHTTPRequestAuthenticationFilter</filter-class>
-      -->
    </filter>
    
    <filter>
       <filter-name>Global Authentication Filter</filter-name>
-      <description>Authentication filter mapped to all authenticated URLs (except web scripts). Mainly for NTLM support</description>
+      <description>Authentication filter mapped to all authenticated URLs. Mainly for SSO support</description>
       <filter-class>org.alfresco.repo.web.filter.beans.BeanProxyFilter</filter-class>
       <init-param>
          <param-name>beanName</param-name>
@@ -121,7 +124,7 @@
 
    <filter>
       <filter-name>WebScript Authentication Filter</filter-name>
-      <description>Authentication filter mapped to web script URLs. Mainly for NTLM support</description>
+      <description>Authentication filter mapped to web script URLs. Mainly for SSO support</description>
       <filter-class>org.alfresco.repo.web.filter.beans.BeanProxyFilter</filter-class>
       <init-param>
          <param-name>beanName</param-name>
@@ -142,13 +145,40 @@
       <filter-name>Admin Authentication Filter</filter-name>
       <filter-class>org.alfresco.web.app.servlet.AdminAuthenticationFilter</filter-class>
    </filter>
-
+   
    <!-- [talendalfresco] command servlet auth filter def -->
    <filter>
       <filter-name>Command Authentication Filter</filter-name>
       <filter-class>fr.openwide.talendalfresco.rest.server.CommandAuthenticationFilter</filter-class>
    </filter>
-   
+
+   <filter>
+      <filter-name>CacheExpiresFilter</filter-name>
+      <description>Set HTTP cache Expires header 30 days forward for a mapping.</description>
+      <filter-class>org.alfresco.web.scripts.servlet.StaticAssetCacheFilter</filter-class>
+      <init-param>
+         <param-name>expires</param-name>
+         <param-value>30</param-value>
+         <description>Add an Expires Header 30 days forward</description>
+      </init-param>
+   </filter>
+
+   <filter>
+      <filter-name>Global Localization Filter</filter-name>
+      <description>Sets fallback default locale for ALL requests</description>
+      <filter-class>org.alfresco.web.app.servlet.GlobalLocalizationFilter</filter-class>
+   </filter>
+
+   <filter>
+      <filter-name>JSF Session Synchronized Filter</filter-name>
+      <filter-class>org.alfresco.repo.web.filter.beans.SessionSynchronizedFilter</filter-class>
+   </filter>
+
+   <filter-mapping>
+      <filter-name>Global Localization Filter</filter-name>
+      <url-pattern>/*</url-pattern>
+   </filter-mapping>
+
    <filter-mapping>
       <filter-name>Global Authentication Filter</filter-name>
       <url-pattern>/navigate/*</url-pattern>
@@ -189,6 +219,7 @@
       <url-pattern>/d/*</url-pattern>
    </filter-mapping>
    
+   <!-- The WebScript Authentication filter sits in front of web service URLs in addition to the global authentication filter -->
    <filter-mapping>
       <filter-name>WebScript Authentication Filter</filter-name>
       <url-pattern>/wcservice/*</url-pattern>
@@ -199,6 +230,16 @@
       <url-pattern>/wcs/*</url-pattern>
    </filter-mapping>
    
+   <filter-mapping>
+      <filter-name>Global Authentication Filter</filter-name>
+      <url-pattern>/wcservice/*</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
+      <filter-name>Global Authentication Filter</filter-name>
+      <url-pattern>/wcs/*</url-pattern>
+   </filter-mapping>
+
    <filter-mapping>
       <filter-name>Global Authentication Filter</filter-name>
       <url-pattern>/ajax/*</url-pattern>
@@ -256,6 +297,32 @@
    </filter-mapping>
    
 
+   <filter-mapping>
+      <filter-name>JSF Session Synchronized Filter</filter-name>
+      <url-pattern>/faces/*</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
+      <filter-name>CacheExpiresFilter</filter-name>
+      <url-pattern>*.jpg</url-pattern>
+   </filter-mapping>
+   <filter-mapping>
+      <filter-name>CacheExpiresFilter</filter-name>
+      <url-pattern>*.png</url-pattern>
+   </filter-mapping>
+   <filter-mapping>
+      <filter-name>CacheExpiresFilter</filter-name>
+      <url-pattern>*.gif</url-pattern>
+   </filter-mapping>
+   <filter-mapping>
+      <filter-name>CacheExpiresFilter</filter-name>
+      <url-pattern>*.css</url-pattern>
+   </filter-mapping>
+   <filter-mapping>
+      <filter-name>CacheExpiresFilter</filter-name>
+      <url-pattern>*.js</url-pattern>
+   </filter-mapping>
+
    <listener>
       <listener-class>org.apache.myfaces.webapp.StartupServletContextListener</listener-class>
    </listener>
@@ -264,13 +331,28 @@
       <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
    </listener>
    
+   <!-- Spring Context Loader listener - can disable loading of context if runtime config changes are needed -->
    <listener>
       <listener-class>org.alfresco.web.app.ContextLoaderListener</listener-class>
    </listener>
 
+   <!-- Web Application Context listener - session create/destroy debugging and bootstrap Spring init -->
    <listener>
       <listener-class>org.alfresco.web.app.ContextListener</listener-class>
    </listener>
+
+   <!-- WebDAV session listener - ensures that no locked resources is left after session expires -->
+   <listener>
+      <listener-class>org.alfresco.repo.webdav.WebDAVSessionListener</listener-class>
+   </listener>
+
+   <!-- Web Services context listener for OpenCMIS -->
+   <listener>
+      <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
+   </listener>
+   
+   <listener><listener-class>org.springframework.web.context.request.RequestContextListener</listener-class></listener>
+
 
    <!-- Faces Servlet -->
    <servlet>
@@ -321,7 +403,7 @@
 
    <servlet>
       <servlet-name>commandServlet</servlet-name>
-      <!-- servlet-class>org.alfresco.web.app.servlet.CommandServlet</servlet-class -->
+      <!-- <servlet-class>org.alfresco.web.app.servlet.CommandServlet</servlet-class> -->
       <!-- [talendalfresco] to manage own tx -->
       <servlet-class>fr.openwide.talendalfresco.rest.server.ContentImportCommandServlet</servlet-class>
    </servlet>
@@ -351,16 +433,16 @@
 
    <servlet>
       <servlet-name>apiServlet</servlet-name>
-      <servlet-class>org.alfresco.web.scripts.servlet.WebScriptServlet</servlet-class>
+      <servlet-class>org.springframework.extensions.webscripts.servlet.WebScriptServlet</servlet-class>
       <init-param>
          <param-name>authenticator</param-name>
          <param-value>webscripts.authenticator.basic</param-value>
       </init-param>
    </servlet>
-
+   
    <servlet>
       <servlet-name>wcapiServlet</servlet-name>
-      <servlet-class>org.alfresco.web.scripts.servlet.WebScriptServlet</servlet-class>
+      <servlet-class>org.springframework.extensions.webscripts.servlet.WebScriptServlet</servlet-class>
       <init-param>
          <param-name>authenticator</param-name>
          <param-value>webscripts.authenticator.webclient</param-value>
@@ -369,7 +451,7 @@
 
    <servlet>
       <servlet-name>portalapiServlet</servlet-name>
-      <servlet-class>org.alfresco.web.scripts.servlet.WebScriptServlet</servlet-class>
+      <servlet-class>org.springframework.extensions.webscripts.servlet.WebScriptServlet</servlet-class>
       <init-param>
          <param-name>authenticator</param-name>
          <param-value>webscripts.authenticator.webclient</param-value>
@@ -378,7 +460,7 @@
 
    <servlet>
       <servlet-name>facebookServlet</servlet-name>
-      <servlet-class>org.alfresco.web.scripts.facebook.FacebookServlet</servlet-class>
+      <servlet-class>org.alfresco.repo.web.scripts.facebook.FacebookServlet</servlet-class>
       <init-param>
          <param-name>authenticator</param-name>
          <param-value>webscripts.authenticator.facebook</param-value>
@@ -387,7 +469,7 @@
 
    <servlet>
       <servlet-name>fbapiServlet</servlet-name>
-      <servlet-class>org.alfresco.web.scripts.facebook.FacebookAPIServlet</servlet-class>
+      <servlet-class>org.alfresco.repo.web.scripts.facebook.FacebookAPIServlet</servlet-class>
       <init-param>
          <param-name>authenticator</param-name>
          <param-value>webscripts.authenticator.facebook</param-value>
@@ -396,7 +478,7 @@
 
    <servlet>
       <servlet-name>proxyServlet</servlet-name>
-      <servlet-class>org.alfresco.web.scripts.servlet.HTTPProxyServlet</servlet-class>
+      <servlet-class>org.alfresco.web.app.servlet.HTTPProxyServlet</servlet-class>
    </servlet>
 
    <servlet>
@@ -409,6 +491,94 @@
       <servlet-class>org.alfresco.web.app.servlet.JBPMDeployProcessServlet</servlet-class>
    </servlet>
 
+   <servlet>
+      <servlet-name>CMISFileShareServlet</servlet-name>
+      <servlet-class>org.apache.chemistry.opencmis.browser.BrowseServlet</servlet-class>
+      <init-param>
+         <param-name>auxroot</param-name>
+         <param-value>cmisfs/browser/</param-value>
+      </init-param>
+      <init-param>
+         <param-name>allow</param-name>
+         <param-value>http.*</param-value>
+      </init-param>
+      <init-param>
+         <param-name>stylesheet:application/atomsvc+xml</param-name>
+         <param-value>/cmisfs/stylesheets/service.xsl</param-value>
+      </init-param>
+      <init-param>
+         <param-name>stylesheet:application/atom+xml;type=feed</param-name>
+         <param-value>/cmisfs/stylesheets/feed.xsl</param-value>
+      </init-param>
+      <init-param>
+         <param-name>stylesheet:application/cmistree+xml</param-name>
+         <param-value>/cmisfs/stylesheets/feed.xsl</param-value>
+      </init-param>
+      <init-param>
+         <param-name>stylesheet:application/atom+xml;type=entry</param-name>
+         <param-value>/cmisfs/stylesheets/entry.xsl</param-value>
+      </init-param>
+      <init-param>
+         <param-name>stylesheet:application/cmisallowableactions+xml</param-name>
+         <param-value>/cmisfs/stylesheets/actions.xsl</param-value>
+      </init-param>
+      <init-param>
+         <param-name>stylesheet:application/cmisacl+xml</param-name>
+         <param-value>/cmisfs/stylesheets/acl.xsl</param-value>
+      </init-param>
+      <init-param>
+         <param-name>override-stylesheet:renditions</param-name>
+         <param-value>/cmisfs/stylesheets/renditions.xsl</param-value>
+      </init-param>
+      <init-param>
+         <param-name>override-stylesheet:relationships</param-name>
+         <param-value>/cmisfs/stylesheets/relationships.xsl</param-value>
+      </init-param>
+      <init-param>
+         <param-name>override-stylesheet:thumbnails</param-name>
+         <param-value>/cmisfs/stylesheets/thumbnails.xsl</param-value>
+      </init-param>
+   </servlet>
+
+   <servlet>
+      <servlet-name>cmisws</servlet-name>
+      <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
+      <load-on-startup>7</load-on-startup>
+   </servlet>
+
+   <servlet>
+      <servlet-name>cmisatom</servlet-name>
+      <servlet-class>org.apache.chemistry.opencmis.server.impl.atompub.CmisAtomPubServlet</servlet-class>
+      <init-param>
+         <param-name>callContextHandler</param-name>
+         <param-value>org.apache.chemistry.opencmis.server.shared.BasicAuthCallContextHandler</param-value>
+      </init-param>
+      <load-on-startup>8</load-on-startup>
+   </servlet>
+
+   <servlet>
+      <servlet-name>cmisbrowser</servlet-name>
+      <servlet-class>org.apache.chemistry.opencmis.server.impl.browser.CmisBrowserBindingServlet</servlet-class>
+      <init-param>
+         <param-name>callContextHandler</param-name>
+         <param-value>org.apache.chemistry.opencmis.server.shared.BasicAuthCallContextHandler</param-value>
+      </init-param>
+      <load-on-startup>8</load-on-startup>
+   </servlet>
+
+   <servlet>
+      <servlet-name>cmistck</servlet-name>
+      <servlet-class>org.apache.chemistry.opencmis.tck.runner.WebRunnerServlet</servlet-class>
+      <load-on-startup>8</load-on-startup>
+   </servlet>
+
+   <servlet>
+      <servlet-name>authenticatorServlet</servlet-name>
+      <servlet-class>org.alfresco.repo.web.scripts.servlet.AuthenticatorServlet</servlet-class>
+   </servlet>
+   
+   <servlet><servlet-name>Vaadin Application Servlet</servlet-name><servlet-class>org.activiti.explorer.servlet.ExplorerApplicationServlet</servlet-class></servlet>
+	
    <servlet-mapping>
       <servlet-name>Faces Servlet</servlet-name>
       <url-pattern>/faces/*</url-pattern>
@@ -574,6 +744,37 @@
       <url-pattern>/workflowdefinitionimage/*</url-pattern>
    </servlet-mapping>
 
+   <servlet-mapping>
+      <servlet-name>CMISFileShareServlet</servlet-name>
+      <url-pattern>/cmisbrowse</url-pattern>
+   </servlet-mapping>
+
+   <servlet-mapping>
+      <servlet-name>cmisws</servlet-name>
+      <url-pattern>/cmisws/*</url-pattern>
+   </servlet-mapping>
+
+   <servlet-mapping>
+      <servlet-name>cmisatom</servlet-name>
+      <url-pattern>/cmisatom/*</url-pattern>
+   </servlet-mapping>
+
+   <servlet-mapping>
+      <servlet-name>cmisbrowser</servlet-name>
+      <url-pattern>/cmisbrowser/*</url-pattern>
+   </servlet-mapping>
+    
+   <!-- The CMIS TCK is deactivated by default. -->
+   <!-- CMISTCK
+   <servlet-mapping>
+      <servlet-name>cmistck</servlet-name>
+      <url-pattern>/cmistck</url-pattern>
+   </servlet-mapping>
+   CMISTCK -->
+   
+   <servlet-mapping><servlet-name>Vaadin Application Servlet</servlet-name><url-pattern>/activiti-admin/*</url-pattern></servlet-mapping>
+   <servlet-mapping><servlet-name>Vaadin Application Servlet</servlet-name><url-pattern>/VAADIN/*</url-pattern></servlet-mapping>
+
    <session-config>
       <session-timeout>60</session-timeout>
    </session-config>
@@ -594,6 +795,75 @@
       <res-auth>Container</res-auth>
       <res-sharing-scope>Unshareable</res-sharing-scope>
    </resource-ref>
+
+   <security-constraint>
+      <web-resource-collection>
+         <web-resource-name>SOLR</web-resource-name>
+         <url-pattern>/service/api/solr/*</url-pattern>
+      </web-resource-collection>
+
+      <auth-constraint>
+         <role-name>repoclient</role-name>
+      </auth-constraint>
+
+      <user-data-constraint>
+         <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+      </user-data-constraint>
+   </security-constraint>
+
+   <security-constraint>
+      <web-resource-collection>
+         <web-resource-name>SOLR</web-resource-name>
+         <url-pattern>/s/api/solr/*</url-pattern>
+      </web-resource-collection>
+
+      <auth-constraint>
+         <role-name>repoclient</role-name>
+      </auth-constraint>
+
+      <user-data-constraint>
+         <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+      </user-data-constraint>
+   </security-constraint>
+   
+   <security-constraint>
+      <web-resource-collection>
+         <web-resource-name>SOLR</web-resource-name>
+         <url-pattern>/wcservice/api/solr/*</url-pattern>
+      </web-resource-collection>
+
+      <auth-constraint>
+         <role-name>repoclient</role-name>
+      </auth-constraint>
+
+      <user-data-constraint>
+         <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+      </user-data-constraint>
+   </security-constraint>
+   
+   <security-constraint>
+      <web-resource-collection>
+         <web-resource-name>SOLR</web-resource-name>
+         <url-pattern>/wcs/api/solr/*</url-pattern>
+      </web-resource-collection>
+
+      <auth-constraint>
+         <role-name>repoclient</role-name>
+      </auth-constraint>
+
+      <user-data-constraint>
+         <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+      </user-data-constraint>
+   </security-constraint>
+   
+   <login-config>
+      <auth-method>CLIENT-CERT</auth-method>
+      <realm-name>Repository</realm-name>
+   </login-config>
+
+   <security-role>
+     <role-name>repoclient</role-name>
+   </security-role>
 
    <env-entry>
       <description>A flag that globally enables or disables startup of the major Alfresco subsystems.</description>

@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.config.Config;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.web.app.Application;
@@ -48,6 +47,7 @@ import org.alfresco.web.app.servlet.command.ExtCommandProcessor;
 import org.alfresco.web.config.CommandServletConfigElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.extensions.config.Config;
 
 import fr.openwide.talendalfresco.rest.server.processor.RestCommandProcessor;
 

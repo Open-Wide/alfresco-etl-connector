@@ -23,7 +23,6 @@ package fr.openwide.talendalfresco.rest.server.command;
 import javax.servlet.http.HttpSession;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.i18n.I18NUtil;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
@@ -34,6 +33,7 @@ import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.extensions.surf.util.I18NUtil;
 
 import fr.openwide.talendalfresco.rest.RestConstants;
 import fr.openwide.talendalfresco.rest.server.RestServerHelper;
@@ -203,7 +203,7 @@ public class LoginCommand extends RestCommandBase {
          session.setAttribute(AuthenticationHelper.AUTHENTICATION_USER, user);
 
          // Set the current locale for Alfresco web app. NB. session exists now.
-         I18NUtil.setLocale(Application.getLanguage(session));
+         I18NUtil.setLocale(Application.getLanguage(session, true));
          
          return user;
          
