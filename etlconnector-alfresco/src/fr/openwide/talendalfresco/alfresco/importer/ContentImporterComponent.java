@@ -264,6 +264,7 @@ public class ContentImporterComponent extends ContentImporterComponentBase {
        }
        catch(RuntimeException e)
        {
+    	   logger.warn("Import error", e);
            nodeImporter.error(e);
            throw e;
        }

@@ -292,8 +292,8 @@ public class ViewParserBase implements Parser
             else if (element instanceof NodeContext)
             {
                 // Process children of node
-                // Note: Process in the following order: aspects, properties and associations
-                Object def = ((NodeContext)element).determineDefinition(defName);
+                // Note: Process in the following order: properties aspects, and associations
+                Object def = determineDefinition(((NodeContext)element), defName);
                 if (def == null)
                 {
                     throw new ImporterException("Definition " + defName + " is not valid; cannot find in Repository dictionary");
@@ -351,6 +351,21 @@ public class ViewParserBase implements Parser
         }
     }
 
+    
+    public Object determineDefinition(NodeContext ctx, QName defName)
+    {
+        Object def = ctx.determineProperty(defName);
+        if (def == null)
+        {
+            def = ctx.determineAspect(defName);
+            if (def == null)
+            {
+                def = ctx.determineAssociation(defName);
+            }
+        }
+        return def;
+    }
+    
     /**
      * Process Root
      * 
