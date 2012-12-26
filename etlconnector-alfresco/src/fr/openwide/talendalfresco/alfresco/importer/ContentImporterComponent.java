@@ -405,7 +405,7 @@ public class ContentImporterComponent extends ContentImporterComponentBase {
                String name = (String) context.getProperties().get(ContentModel.PROP_NAME);
                NodeRef existingNodeRef = namePathService.getChildByPathName(name,
                      context.getParentContext().getParentRef(),
-                     contentImporterBinding.targetLocationContainerTypeQName);
+                     ContentModel.ASSOC_CONTAINS);
                
                if (ContentImporterConfiguration.CONTAINER_MODE_CREATE_OR_UPDATE.equals(contentImporterBinding.containerMode)) {
                   if (existingNodeRef != null) {
@@ -431,7 +431,7 @@ public class ContentImporterComponent extends ContentImporterComponentBase {
                String name = (String) context.getProperties().get(ContentModel.PROP_NAME);
                NodeRef existingNodeRef = namePathService.getChildByPathName(name,
                      context.getParentContext().getParentRef(),
-                     contentImporterBinding.targetLocationContainerTypeQName);
+                     ContentModel.ASSOC_CONTAINS);
                
                if (ContentImporterConfiguration.DOCUMENT_MODE_CREATE_ONLY.equals(contentImporterBinding.documentMode)) {
                   if (existingNodeRef != null) {
