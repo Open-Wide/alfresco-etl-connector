@@ -24,6 +24,7 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.view.ImporterBinding;
+import org.alfresco.service.cmr.view.ImporterContentCache;
 import org.alfresco.service.namespace.QName;
 
 import fr.openwide.talendalfresco.alfresco.NamePathService;
@@ -113,6 +114,11 @@ public class ContentImporterBinding extends ContentImporterConfiguration impleme
 
    public void setNamePathService(NamePathService namePathService) {
       this.namePathService = namePathService;
+   }
+   
+   public ImporterContentCache getImportConentCache() {
+      // TODO: implement this method.
+	   return null;
    }
 
 }
